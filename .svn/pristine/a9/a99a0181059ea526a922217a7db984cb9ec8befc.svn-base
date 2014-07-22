@@ -1,0 +1,175 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/resultlinear"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/result_bg" >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/main_top_bg" />
+            
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="531px"
+        android:layout_marginTop="18px"
+        android:src="@drawable/main_usb" />
+    
+   	<TextView
+        android:id="@+id/timeText" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:typeface="sans"
+        android:textSize="24px"
+        android:textColor="#444444"
+        android:shadowColor="#7F000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="1.2"
+        android:layout_marginLeft="578px"
+        android:layout_marginTop="15px" />
+
+   	<Button
+        android:id="@+id/homeicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="726px"
+        android:background="@drawable/home_selector" />
+ 		   	       	    	
+   	<TextView 
+	    android:id="@+id/hba1cPct"
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="500px"
+        android:layout_marginTop="84px"
+        android:typeface="sans"
+        android:textSize="85px"
+        android:textColor="#1F3E6F"
+        android:textStyle="bold" />
+	    
+   	<TextView 
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="%"
+        android:typeface="sans"
+        android:textSize="48px"
+        android:textColor="#1F3D6F"
+        android:textStyle="bold"                
+        android:layout_toRightOf="@id/hba1cPct"
+        android:layout_alignBaseline="@id/hba1cPct" />
+     
+	<RelativeLayout 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+        android:layout_marginLeft="428px"
+        android:layout_marginTop="208px" >
+	    
+		<TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="NGSP"
+	        android:typeface="sans"
+	        android:textSize="20px"
+	        android:textColor="#242424"
+	        android:layout_marginTop="0px" />
+		
+		<TextView
+		    android:id="@+id/r_range"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="4.0 - 6.0"
+	        android:typeface="sans"
+	        android:textSize="20px"
+	        android:textColor="#242424"
+	        android:layout_marginTop="30px" />
+		
+		<TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@id/r_range"
+	        android:layout_alignBaseline="@id/r_range"
+	        android:text="%"
+	        android:typeface="sans"
+	        android:textSize="12px"
+	        android:textColor="#242424"
+	        android:layout_marginLeft="5px" />
+		
+		<TextView
+		    android:id="@+id/r_testdate1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:typeface="sans"
+	        android:textSize="20px"
+	        android:textColor="#242424"
+	        android:layout_marginTop="90px" />
+		
+		<TextView
+		    android:id="@+id/r_testdate2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@id/r_testdate1"
+	        android:layout_alignBaseline="@id/r_testdate1"
+	        android:typeface="sans"
+	        android:textSize="12px"
+	        android:textColor="#242424"
+	        android:layout_marginLeft="5px" />
+		
+		<TextView
+		    android:id="@+id/ref"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:typeface="sans"
+	        android:textSize="20px"
+	        android:textColor="#242424"
+	        android:layout_marginTop="60px" />
+		
+		<TextView
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="---"
+	        android:typeface="sans"
+	        android:textSize="20px"
+	        android:textColor="#242424"
+	        android:layout_marginTop="120px" />
+	    	    
+	</RelativeLayout>
+			
+    <Button
+        android:id="@+id/patientidscanbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Patient ID Scan"
+        android:typeface="sans"
+        android:textSize="20px"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="146px"
+        android:layout_marginTop="396px"
+        android:background="@drawable/btn_selector1" />   
+                  
+    <Button
+        android:id="@+id/printbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Print"
+        android:typeface="sans"
+        android:textSize="20px"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="329px"
+        android:layout_marginTop="396px"
+        android:background="@drawable/btn_selector1" />   
+
+    <Button
+        android:id="@+id/nextsamplebtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next Sample"
+        android:typeface="sans"
+        android:textSize="20px"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="511px"
+        android:layout_marginTop="396px"
+        android:background="@drawable/btn_selector1" />
+    	    
+</RelativeLayout>
