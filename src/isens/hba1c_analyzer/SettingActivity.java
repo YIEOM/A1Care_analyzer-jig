@@ -16,7 +16,8 @@ public class SettingActivity extends Activity {
 	private Button systemBtn,
 				   dataBtn,
 				   maintenanceBtn,
-				   escIcon;
+				   escIcon,
+				   testBtn;
 	
 	private static TextView TimeText;
 	
@@ -54,20 +55,20 @@ public class SettingActivity extends Activity {
 			}
 		});
 		
-		/*Maintenance Activity activation*/
-		maintenanceBtn = (Button)findViewById(R.id.maintenancebtn);
-		maintenanceBtn.setOnClickListener(new View.OnClickListener() {
+		/*Test Activity activation*/
+		testBtn = (Button)findViewById(R.id.testbtn);
+		testBtn.setOnClickListener(new View.OnClickListener() {
 		
 			public void onClick(View v) {
 			
-//				maintenanceBtn.setEnabled(false);
-//				
-//				WhichIntent(TargetIntent.Maintenance);
+				testBtn.setEnabled(false);
+				
+				WhichIntent(TargetIntent.Maintenance);
 			}
 		});
 		
 		/*Home Activity activation*/
-		escIcon = (Button)findViewById(R.id.backicon);
+		escIcon = (Button)findViewById(R.id.escicon);
 		escIcon.setOnClickListener(new View.OnClickListener() {
 		
 			public void onClick(View v) {
@@ -120,8 +121,8 @@ public class SettingActivity extends Activity {
 			break;			
 			
 		case Maintenance	:		
-			Intent MaintenanceIntent = new Intent(getApplicationContext(), MaintenanceActivity.class);
-			startActivity(MaintenanceIntent);
+			Intent TestIntent = new Intent(getApplicationContext(), TestActivity.class);
+			startActivity(TestIntent);
 			break;
 			
 		default		:	

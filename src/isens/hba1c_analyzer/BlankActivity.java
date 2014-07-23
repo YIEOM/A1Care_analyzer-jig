@@ -18,11 +18,15 @@ public class BlankActivity extends Activity {
 
 	private SerialPort BlankSerial;
 	private RunActivity BlankRun;
+	public Temperature BlankTemp;
 	
 	private static TextView TimeText;
 	private ImageView barani;
 	
 	private RunActivity.AnalyzerState blankState;
+	
+	public static double StartCellBlockTemp[] = new double[5],
+						 StartAmbientTemp[] = new double[5];
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -46,6 +50,22 @@ public class BlankActivity extends Activity {
 		BlankRun = new RunActivity();
 		
 		blankState = RunActivity.AnalyzerState.MeasurePosition;
+		
+		switch(TestActivity.WhichTest) {
+		
+		case TestActivity.PHOTO_TEMPERATURE	:
+			BlankTemp = new Temperature();
+			
+			for(int i = 0; i < 5; i++) {
+				
+				StartCellBlockTemp[i] = BlankTemp.CellTmpRead();
+				StartAmbientTemp[i] = BlankTemp.AmbTmpRead();
+			}
+			break;
+			
+		default	:
+			break;
+		}
 		
 		BlankStep BlankBlank = new BlankStep();
 		BlankBlank.start();
@@ -75,17 +95,19 @@ public class BlankActivity extends Activity {
 				
 				case MeasurePosition :
 					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-					BoardMessage(RunActivity.OPERATE_COMPLETE, 5, RunActivity.AnalyzerState.NoResponse);
-					//					while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+					BoardMessage(RunActivity.OPERATE_COMPLETE, 5, RunActivity.AnalyzerState.FilterDark);
 					BarAnimation(178);
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.OPERATE_COMPLETE, 5, RunActivity.AnalyzerState.NoResponse);
+					BarAnimation(206);
 					break;
 				}
 			}
 			
 			/* Dark filter Measurement */
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
-			BarAnimation(206);
 			RunActivity.BlankValue[0] = 0;
 			RunActivity.BlankValue[0] = AbsorbanceMeasure(); // Dark Absorbance
 			

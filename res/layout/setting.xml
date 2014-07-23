@@ -3,32 +3,28 @@
     android:layout_height="match_parent"
     android:background="@drawable/background" >
     
-    <Button
-        android:id="@+id/escicon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="728px"
-        android:background="@drawable/esc_selector" />
-    
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:src="@drawable/title" />
+        android:src="@drawable/title"
+        android:background="#00000000" />
     
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="128px"
         android:layout_marginTop="20px"
-        android:src="@drawable/setting_title" />
+        android:src="@drawable/ss_title"
+        android:background="#00000000" />
             
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="531px"
         android:layout_marginTop="18px"
-        android:src="@drawable/main_usb" />
+        android:src="@drawable/main_usb"
+        android:background="#00000000" />
     
    	<TextView
         android:id="@+id/timeText" 
@@ -43,6 +39,13 @@
         android:shadowRadius="1.2"
         android:layout_marginLeft="578px"
         android:layout_marginTop="15px" />
+   		
+   	<Button
+        android:id="@+id/escicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="728px"
+        android:background="@drawable/esc_selector" />
    		
    	<RelativeLayout 
    	    android:layout_width="wrap_content"
@@ -147,7 +150,7 @@
         android:layout_marginTop="137px" >
    	    
    	    <Button
-	        android:id="@+id/maintenancebtn"
+	        android:id="@+id/testbtn"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:background="@drawable/settingmodebtn_selector" />
@@ -165,7 +168,7 @@
 	        android:layout_marginTop="190px" 
 	        android:layout_centerHorizontal="true"
 		    android:gravity="center"
-		    android:text="MAINTENANCE"
+		    android:text="TEST"
 	        android:typeface="sans"
 	        android:textSize="20px"
 	        android:textColor="#565656" />

@@ -46,8 +46,24 @@ public class RemoveActivity extends Activity {
 		TimerDisplay.timerState = whichClock.RemoveClock;		
 		CurrTimeDisplay();
 		
-		UserAction UserActionObj = new UserAction();
-		UserActionObj.start();
+		switch(TestActivity.WhichTest) {
+		
+		case TestActivity.PHOTO_TEMPERATURE	:
+			if(++TestActivity.NumofPhotoTemp != TestActivity.NUMBER_PHOTO_TEMP) {
+				
+				WhichIntent(TargetIntent.Blank);
+				
+			} else {
+				
+				WhichIntent(TargetIntent.Home);	
+			}
+			break;
+			
+		default	:
+			UserAction UserActionObj = new UserAction();
+			UserActionObj.start();
+			break;
+		}
 	}
 	
 	public void CurrTimeDisplay() {
@@ -166,6 +182,11 @@ public class RemoveActivity extends Activity {
 		case Action		:				
 			Intent ActionIntent = new Intent(getApplicationContext(), ActionActivity.class);
 			startActivity(ActionIntent);
+			break;
+			
+		case Blank		:				
+			Intent BlankIntent = new Intent(getApplicationContext(), BlankActivity.class);
+			startActivity(BlankIntent);
 			break;
 			
 		default		:	

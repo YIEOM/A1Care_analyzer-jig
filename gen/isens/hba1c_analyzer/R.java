@@ -282,14 +282,15 @@ public final class R {
     }
     public static final class id {
         public static final int HbA1cText=0x7f0b001f;
+        public static final int abtn=0x7f0b00aa;
         public static final int ackText=0x7f0b0062;
-        public static final int action_settings=0x7f0b00ad;
+        public static final int action_settings=0x7f0b00b6;
         public static final int actionlinear=0x7f0b0000;
         public static final int adjustbtn=0x7f0b00a0;
         public static final int ambienttemptext=0x7f0b00a5;
-        public static final int ampmdownbtn=0x7f0b00a8;
-        public static final int ampmtext=0x7f0b00a7;
-        public static final int ampmupbtn=0x7f0b00a6;
+        public static final int ampmdownbtn=0x7f0b00b1;
+        public static final int ampmtext=0x7f0b00b0;
+        public static final int ampmupbtn=0x7f0b00af;
         public static final int backicon=0x7f0b0022;
         public static final int bargauge=0x7f0b0059;
         public static final int birthtext=0x7f0b0065;
@@ -297,6 +298,7 @@ public final class R {
         public static final int calibrationbtn=0x7f0b00a2;
         public static final int cancelbtn=0x7f0b0069;
         public static final int canclebtn=0x7f0b0057;
+        public static final int cbtn=0x7f0b00ab;
         public static final int cellblocktemptext=0x7f0b00a4;
         public static final int chdckbox1=0x7f0b0024;
         public static final int chdckbox2=0x7f0b0029;
@@ -335,26 +337,28 @@ public final class R {
         public static final int fullbtn=0x7f0b0020;
         public static final int gendertext=0x7f0b0066;
         public static final int hba1cPct=0x7f0b008d;
-        public static final int hminusbtn=0x7f0b00ab;
+        public static final int hminusbtn=0x7f0b00b4;
         public static final int homeicon=0x7f0b0023;
         public static final int homelinear=0x7f0b007b;
-        public static final int hourtext=0x7f0b00aa;
-        public static final int hplusbtn=0x7f0b00a9;
+        public static final int hourtext=0x7f0b00b3;
+        public static final int hplusbtn=0x7f0b00b2;
         public static final int ipaddretext=0x7f0b006b;
+        public static final int labviewbtn=0x7f0b00a6;
         public static final int languagebtn=0x7f0b009f;
         public static final int languagetext=0x7f0b0080;
+        public static final int lbtn=0x7f0b00a9;
         public static final int leftbtn=0x7f0b007f;
         public static final int loginbtn=0x7f0b0085;
         public static final int logindbbtn=0x7f0b0084;
         public static final int loginoid=0x7f0b0082;
         public static final int loginpass=0x7f0b0083;
-        public static final int maintenancebtn=0x7f0b0097;
-        public static final int mintext=0x7f0b00ac;
+        public static final int mintext=0x7f0b00b5;
         public static final int minusbtn=0x7f0b0058;
         public static final int mminusbtn=0x7f0b0049;
         public static final int monthtext=0x7f0b0048;
         public static final int mplusbtn=0x7f0b0047;
         public static final int nametext=0x7f0b0064;
+        public static final int nbtn=0x7f0b00ac;
         public static final int nextbtn=0x7f0b0060;
         public static final int nextsamplebtn=0x7f0b0092;
         public static final int nextviewbtn=0x7f0b003f;
@@ -370,6 +374,8 @@ public final class R {
         public static final int patientbtn=0x7f0b0040;
         public static final int patientidscanbtn=0x7f0b0091;
         public static final int patientidtext=0x7f0b0063;
+        public static final int pbtn=0x7f0b00ad;
+        public static final int phototempbtn=0x7f0b00a8;
         public static final int plusbtn=0x7f0b005a;
         public static final int portetext=0x7f0b0073;
         public static final int previousviewbtn=0x7f0b003d;
@@ -413,6 +419,7 @@ public final class R {
         public static final int sixtwo=0x7f0b001b;
         public static final int slopeetext=0x7f0b0005;
         public static final int soundbtn=0x7f0b009e;
+        public static final int stabilitybtn=0x7f0b00a7;
         public static final int systembtn=0x7f0b0087;
         public static final int systemcheckani=0x7f0b0099;
         public static final int systemchecklinear=0x7f0b0098;
@@ -426,12 +433,14 @@ public final class R {
         public static final int tableRow6=0x7f0b0074;
         public static final int tableRow7=0x7f0b0076;
         public static final int tableRow8=0x7f0b0078;
+        public static final int tbtn=0x7f0b00ae;
         public static final int tempbtn=0x7f0b00a3;
         public static final int testNum1=0x7f0b0025;
         public static final int testNum2=0x7f0b002a;
         public static final int testNum3=0x7f0b002f;
         public static final int testNum4=0x7f0b0034;
         public static final int testNum5=0x7f0b0039;
+        public static final int testbtn=0x7f0b0097;
         public static final int testdate=0x7f0b004e;
         public static final int testno=0x7f0b004d;
         public static final int text=0x7f0b0061;
@@ -491,8 +500,9 @@ public final class R {
         public static final int systemsetting=0x7f03001f;
         public static final int temperature=0x7f030020;
         public static final int tempfilesave=0x7f030021;
-        public static final int time=0x7f030022;
-        public static final int waitpopup=0x7f030023;
+        public static final int test=0x7f030022;
+        public static final int time=0x7f030023;
+        public static final int waitpopup=0x7f030024;
     }
     public static final class menu {
         public static final int home=0x7f0a0000;

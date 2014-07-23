@@ -16,9 +16,13 @@ public class TimerDisplay {
 	public Handler handler = new Handler();
 	public static TimerTask OneHundredmsPeriod;
 	
-	public enum whichClock 	{HomeClock, TestClock, RunClock, ActionClock, ResultClock, MemoryClock, BlankClock, SettingClock, SystemSettingClock, RemoveClock, PatientClock, ControlClock, ExportClock,
-							ImageClock, DataSettingClock, MaintenanceClock, DateClock, TimeClock, DisplayClock, HISClock, HISSettingClock, AdjustmentClock, SoundClock, CalibrationClock, LanguageClock,
-							SystemCheckClock, CorrelationClock, TemperatureClock}
+	public enum whichClock 	{HomeClock, TestClock, RunClock, ActionClock, ResultClock, 
+							 MemoryClock, BlankClock, SettingClock, SystemSettingClock, 
+							 RemoveClock, PatientClock, ControlClock, ExportClock,
+							 ImageClock, DataSettingClock, MaintenanceClock, DateClock, 
+							 TimeClock, DisplayClock, HISClock, HISSettingClock, AdjustmentClock, 
+							 SoundClock, CalibrationClock, LanguageClock, SystemCheckClock, 
+							 CorrelationClock, TemperatureClock}
 	public static whichClock timerState;
 
 	final static String rTime[] = new String[8];

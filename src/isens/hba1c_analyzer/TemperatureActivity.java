@@ -147,10 +147,10 @@ public class TemperatureActivity extends Activity {
 		cellBlockTempData[dataIndex] = cellBlockStr;
 		ambientTempData[dataIndex++] = ambientStr;
 		
-		if(dataIndex == 256) {
-			
-			WhichIntent(TargetIntent.FileSave);
-		}
+//		if(dataIndex == 256) {
+//			
+//			WhichIntent(TargetIntent.FileSave);
+//		}
 	}
 	
 	public void WhichIntent(TargetIntent Itn) { // Activity conversion

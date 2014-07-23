@@ -1,5 +1,6 @@
 package isens.hba1c_analyzer;
 
+import isens.hba1c_analyzer.ActionActivity.BarcodeScan;
 import isens.hba1c_analyzer.HomeActivity.TargetIntent;
 import isens.hba1c_analyzer.TimerDisplay.whichClock;
 
@@ -31,7 +32,7 @@ public class ResultActivity extends Activity {
 	final static byte ACTION_ACTIVITY = 1,
 					  HOME_ACTIVITY = 2;
 	
-	private Temperature ResultTmp;
+	private Temperature ResultTemp;
 	private SerialPort ResultSerial;
 	
 	public static TextView TimeText;
@@ -56,7 +57,8 @@ public class ResultActivity extends Activity {
 	
 	public static int ItnData;
 	public int dataCnt;
-	private double cellBlockEndTmp;
+	private double EndCellBlockTemp[] = new double[5],
+				   EndAmbientTemp[] = new double[5];
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -150,20 +152,38 @@ public class ResultActivity extends Activity {
 		CurrTimeDisplay();
 		
 		GetCurrTime();
-		GetDataCnt();
 		
-		ResultTmp = new Temperature();
-		cellBlockEndTmp = ResultTmp.CellTmpRead();
+		double cellBlockTemp = 0,
+				   ambientTemp = 0;
+					
+		switch(TestActivity.WhichTest) {
 		
-		HbA1cText = (TextView)findViewById(R.id.hba1cPct);
-		DateText = (TextView)findViewById(R.id.r_testdate1);
-		AMPMText = (TextView)findViewById(R.id.r_testdate2);
-		Ref = (TextView) findViewById(R.id.ref);
-		
-		HbA1cText.setText(RunActivity.HbA1cPctStr);
-		DateText.setText(TimerDisplay.rTime[0] + "." + TimerDisplay.rTime[1] + "." + TimerDisplay.rTime[2] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
-		AMPMText.setText(TimerDisplay.rTime[3]);
-		Ref.setText(Barcode.RefNum);
+		case TestActivity.PHOTO_TEMPERATURE	:
+			ResultTemp = new Temperature();
+			
+			for(int i = 0; i < 5; i++) {
+				
+				EndCellBlockTemp[i] = ResultTemp.CellTmpRead();
+				EndAmbientTemp[i] = ResultTemp.AmbTmpRead();
+			}
+			
+			WhichIntent(TargetIntent.Test);
+			break;
+			
+		default	:
+			GetDataCnt();
+			
+			HbA1cText = (TextView)findViewById(R.id.hba1cPct);
+			DateText = (TextView)findViewById(R.id.r_testdate1);
+			AMPMText = (TextView)findViewById(R.id.r_testdate2);
+			Ref = (TextView) findViewById(R.id.ref);
+			
+			HbA1cText.setText(RunActivity.HbA1cPctStr);
+			DateText.setText(TimerDisplay.rTime[0] + "." + TimerDisplay.rTime[1] + "." + TimerDisplay.rTime[2] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
+			AMPMText.setText(TimerDisplay.rTime[3]);
+			Ref.setText(Barcode.RefNum);
+			break;
+		}
 	}
 	
 	public void CurrTimeDisplay() {
@@ -262,39 +282,52 @@ public class ResultActivity extends Activity {
 		DataSaveIntent.putExtra("BlankVal1", photoDfm.format(RunActivity.BlankValue[1]));
 		DataSaveIntent.putExtra("BlankVal2", photoDfm.format(RunActivity.BlankValue[2]));
 		DataSaveIntent.putExtra("BlankVal3", photoDfm.format(RunActivity.BlankValue[3]));
-		DataSaveIntent.putExtra("St1Abs1by0", absorbDfm.format(RunActivity.Step1stAbsorb1[0]));
-		DataSaveIntent.putExtra("St1Abs1by1", absorbDfm.format(RunActivity.Step1stAbsorb1[1]));
-		DataSaveIntent.putExtra("St1Abs1by2", absorbDfm.format(RunActivity.Step1stAbsorb1[2]));
-		DataSaveIntent.putExtra("St1Abs2by0", absorbDfm.format(RunActivity.Step1stAbsorb2[0]));
-		DataSaveIntent.putExtra("St1Abs2by1", absorbDfm.format(RunActivity.Step1stAbsorb2[1]));
-		DataSaveIntent.putExtra("St1Abs2by2", absorbDfm.format(RunActivity.Step1stAbsorb2[2]));
-		DataSaveIntent.putExtra("St1Abs3by0", absorbDfm.format(RunActivity.Step1stAbsorb3[0]));
-		DataSaveIntent.putExtra("St1Abs3by1", absorbDfm.format(RunActivity.Step1stAbsorb3[1]));
-		DataSaveIntent.putExtra("St1Abs3by2", absorbDfm.format(RunActivity.Step1stAbsorb3[2]));
-		DataSaveIntent.putExtra("St2Abs1by0", absorbDfm.format(RunActivity.Step2ndAbsorb1[0]));
-		DataSaveIntent.putExtra("St2Abs1by1", absorbDfm.format(RunActivity.Step2ndAbsorb1[1]));
-		DataSaveIntent.putExtra("St2Abs1by2", absorbDfm.format(RunActivity.Step2ndAbsorb1[2]));
-		DataSaveIntent.putExtra("St2Abs2by0", absorbDfm.format(RunActivity.Step2ndAbsorb2[0]));
-		DataSaveIntent.putExtra("St2Abs2by1", absorbDfm.format(RunActivity.Step2ndAbsorb2[1]));
-		DataSaveIntent.putExtra("St2Abs2by2", absorbDfm.format(RunActivity.Step2ndAbsorb2[2]));
-		DataSaveIntent.putExtra("St2Abs3by0", absorbDfm.format(RunActivity.Step2ndAbsorb3[0]));
-		DataSaveIntent.putExtra("St2Abs3by1", absorbDfm.format(RunActivity.Step2ndAbsorb3[1]));
-		DataSaveIntent.putExtra("St2Abs3by2", absorbDfm.format(RunActivity.Step2ndAbsorb3[2]));
-
-		switch(Itn) {
 		
-		case Home		:							
-			DataSaveIntent.putExtra("WhichIntent", (int) HOME_ACTIVITY);
+		for(int i = 0; i < 3; i++) {
+			
+			DataSaveIntent.putExtra("St1Abs1by" + Integer.toString(i), absorbDfm.format(RunActivity.Step1stAbsorb1[i]));
+			DataSaveIntent.putExtra("St1Abs2by" + Integer.toString(i), absorbDfm.format(RunActivity.Step1stAbsorb2[i]));
+			DataSaveIntent.putExtra("St1Abs3by" + Integer.toString(i), absorbDfm.format(RunActivity.Step1stAbsorb3[i]));
+			DataSaveIntent.putExtra("St2Abs1by" + Integer.toString(i), absorbDfm.format(RunActivity.Step2ndAbsorb1[i]));
+			DataSaveIntent.putExtra("St2Abs2by" + Integer.toString(i), absorbDfm.format(RunActivity.Step2ndAbsorb2[i]));
+			DataSaveIntent.putExtra("St2Abs3by" + Integer.toString(i), absorbDfm.format(RunActivity.Step2ndAbsorb3[i]));
+		}
+		
+		switch(TestActivity.WhichTest) {
+		
+		case TestActivity.PHOTO_TEMPERATURE	:
+			for(int i =0; i < 5; i++) {
+				
+				DataSaveIntent.putExtra("CellBlockTemp1" + Integer.toString(i), photoDfm.format(BlankActivity.StartCellBlockTemp[i]));
+				DataSaveIntent.putExtra("CellBlockTemp2" + Integer.toString(i), photoDfm.format(ActionActivity.MidCellBlockTemp[i]));
+				DataSaveIntent.putExtra("CellBlockTemp3" + Integer.toString(i), photoDfm.format(EndCellBlockTemp[i]));
+				DataSaveIntent.putExtra("AmbientTemp1" + Integer.toString(i), photoDfm.format(BlankActivity.StartAmbientTemp[i]));
+				DataSaveIntent.putExtra("AmbientTemp2" + Integer.toString(i), photoDfm.format(ActionActivity.MidAmbientTemp[i]));
+				DataSaveIntent.putExtra("AmbientTemp3" + Integer.toString(i), photoDfm.format(EndAmbientTemp[i]));
+			}
+			
+			DataSaveIntent.putExtra("WhichIntent", TestActivity.PHOTO_TEMPERATURE);
 			startActivity(DataSaveIntent);
 			break;
+			
+		default	:
+			switch(Itn) {
+			
+			case Home		:							
+				DataSaveIntent.putExtra("WhichIntent", (int) HOME_ACTIVITY);
+				startActivity(DataSaveIntent);
+				break;
 
-		case Run	:			
-			DataSaveIntent.putExtra("WhichIntent", (int) ACTION_ACTIVITY);
-			startActivity(DataSaveIntent);
+			case Run	:			
+				DataSaveIntent.putExtra("WhichIntent", (int) ACTION_ACTIVITY);
+				startActivity(DataSaveIntent);
+				break;
+
+			default			:	
+				break;			
+			}
+			
 			break;
-
-		default			:	
-			break;			
 		}	
 		
 		finish();

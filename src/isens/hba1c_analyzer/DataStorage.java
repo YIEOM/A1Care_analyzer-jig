@@ -18,7 +18,8 @@ public class DataStorage extends Activity {
 	final static String SAVE_DIRECTORY = "/isens/save", // Save directory path name
 						SAVE_CONTROL_FILENAME  = "/ControlData", // Save file name
 						SAVE_PATIENT_FILENAME  = "/PatientData", // Save file name
-						SAVE_HIS_FILENAME  = "/HistoryData"; // Save file name
+						SAVE_HIS_FILENAME  = "/HistoryData", // Save file name
+						SAVE_PHOTOTEMP_FILENAME  = "/PhotoTempData"; // Save file name
 	
 	public String SDCardState() { // Check insertion state of uSD card and research for mounted path
 		
@@ -126,6 +127,44 @@ public class DataStorage extends Activity {
 			fos.write(sData1.toString().getBytes());
 			fos.write("\r\n".getBytes());
 			fos.write("Ambient :\t".getBytes());
+			fos.write(sData2.toString().getBytes());
+			fos.write("\r\n".getBytes());
+			fos.close();
+			
+			while(!file.exists()); // Wait until file is created
+			
+		} catch(FileNotFoundException e) {
+			
+			e.printStackTrace();					
+			return;
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			return;
+		}		
+	}
+	
+	public synchronized void PhotoTempSave(StringBuffer sData1, StringBuffer sData2) { // Save data to uSD card
+		
+		String sdPath = SDCardState();
+		
+		File dir = new File(sdPath + SAVE_DIRECTORY); // File directory
+				 		
+		File file = new File(sdPath + SAVE_DIRECTORY + SAVE_PHOTOTEMP_FILENAME + ".txt"); // File
+				
+		try {
+
+			if(!dir.isDirectory()) { // if directory doesn't exist 
+
+				dir.mkdirs();
+				file.createNewFile();
+			}
+			
+			FileOutputStream fos = new FileOutputStream(file, true);
+			
+			fos.write(sData1.toString().getBytes());
+			fos.write("\t".getBytes());
 			fos.write(sData2.toString().getBytes());
 			fos.write("\r\n".getBytes());
 			fos.close();

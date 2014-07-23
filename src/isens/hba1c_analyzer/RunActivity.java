@@ -667,6 +667,23 @@ public class RunActivity extends Activity {
 		
 		double A, B, St, Bt, SLA, SHA, BLA, BHA, SLV, SHV, BLV, BHV, a3, b3, b32, a4, b4;
 					
+		switch(TestActivity.WhichTest) {
+		
+		case TestActivity.PHOTO_TEMPERATURE	:
+			Barcode.a1 = 0.0109;
+			Barcode.b1 = -0.0137;
+			Barcode.L = 5.8;
+			Barcode.H = 8.7;
+			Barcode.a21 = 0.0461;
+			Barcode.b21 = 0.0246;
+			Barcode.a22 = 0.039;
+			Barcode.b22 = 0.0219;
+			break;
+			
+		default	:
+			break;
+		}
+		
 		A = Absorb1stHandling();
 		B = Absorb2ndHandling();
 		

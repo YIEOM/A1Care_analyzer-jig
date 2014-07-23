@@ -32,6 +32,7 @@ public class ActionActivity extends Activity {
 	
 	private GpioPort ActionGpio;
 	private SerialPort ActionSerial;
+	public Temperature ActionTemp;
 	
 	private Handler handler = new Handler();
 	private Timer timer;
@@ -57,6 +58,9 @@ public class ActionActivity extends Activity {
 	
 	public static byte CartridgeCheckFlag, 
 					   DoorCheckFlag;
+	
+	public static double MidCellBlockTemp[] = new double[5],
+						 MidAmbientTemp[] = new double[5];
 	
 	protected void onCreate(Bundle savedInstanceState) {
 			
@@ -147,14 +151,32 @@ public class ActionActivity extends Activity {
 		ActionSerial.BarcodeRxStart();
 		
 		ESCButtonFlag = false;
+			
+		switch(TestActivity.WhichTest) {
 		
-		actionLinear.post(new Runnable() {
-	        public void run() {
-	        	
-	        	BarcodeScan BarcodeScanObj = new BarcodeScan();
-	        	BarcodeScanObj.start();
-	        }
-		});
+		case TestActivity.PHOTO_TEMPERATURE	:
+			SerialPort.Sleep(10000);
+			
+			ActionTemp = new Temperature();
+			
+			for(int i = 0; i < 5; i++) {
+				
+				MidCellBlockTemp[i] = ActionTemp.CellTmpRead();
+				MidAmbientTemp[i] = ActionTemp.AmbTmpRead();
+			}
+			WhichIntent(TargetIntent.Run);
+			break;
+			
+		default	:
+			actionLinear.post(new Runnable() {
+		        public void run() {
+		        	
+		        	BarcodeScan BarcodeScanObj = new BarcodeScan();
+		        	BarcodeScanObj.start();
+		        }
+			});			
+			break;
+		}
 	}
 	
 	public void CurrTimeDisplay() {

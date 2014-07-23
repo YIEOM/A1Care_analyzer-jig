@@ -60,7 +60,7 @@ public class SystemCheckActivity extends Activity {
 		systemCheckLinear = (RelativeLayout)findViewById(R.id.systemchecklinear);		
 		errorPopupView = View.inflate(getApplicationContext(), R.layout.errorpopup, null);
 		errorPopup = new PopupWindow(errorPopupView, 478, 155, true);
-				
+
 		SystemCheckInit();
 	}
 	
@@ -90,8 +90,11 @@ public class SystemCheckActivity extends Activity {
 		
 		VolumeInit();
 		
-		SensorCheck SensorCheckObj = new SensorCheck();
-		SensorCheckObj.start();
+		TemperatureCheck TemperatureCheckObj = new TemperatureCheck();
+		TemperatureCheckObj.start();
+		
+//		SensorCheck SensorCheckObj = new SensorCheck();
+//		SensorCheckObj.start();
 	}
 	
 	public class SensorCheck extends Thread {

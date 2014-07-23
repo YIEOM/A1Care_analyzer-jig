@@ -64,7 +64,12 @@ public class HomeActivity extends Activity {
 				   loginDBBtn,
 				   checkBtn;
 	
-	public enum TargetIntent {Home, HbA1c, NA, Action, Run, Blank, Memory, Result, ResultStop, ResultError, Remove, Image, Date, Setting, SystemSetting, DataSetting, Time, Display, HIS, HISSetting, Export, Maintenance, FileSave, ControlFileLoad, PatientFileLoad, NextFile, PreFile, Adjustment, Sound, Calibration, Language, Correlation, Temperature}
+	public enum TargetIntent {Home, HbA1c, NA, Action, Run, Blank, Memory, Result, ResultStop, 
+							  ResultError, Remove, Image, Date, Setting, SystemSetting, DataSetting, 
+							  Time, Display, HIS, HISSetting, Export, Maintenance, FileSave, 
+							  ControlFileLoad, PatientFileLoad, NextFile, PreFile, Adjustment, Sound, 
+							  Calibration, Language, Correlation, Temperature, LabView, Stability, 
+							  Temp, Test}
 	
 	private static TextView TimeText;
 	
@@ -108,10 +113,9 @@ public class HomeActivity extends Activity {
 			
 				runBtn.setEnabled(false);
 				
-				WhichIntent(TargetIntent.Blank);
+				TestActivity.WhichTest = TestActivity.NORMAL;
 				
-//				HomeSerial = new SerialPort();
-//				HomeSerial.BoardTx(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+				WhichIntent(TargetIntent.Blank);
 			}
 		});
 		
@@ -149,7 +153,7 @@ public class HomeActivity extends Activity {
 				
 				errorPopup.dismiss();
 				
-				Login();
+//				Login();
 			}
 		});
 		
@@ -209,7 +213,7 @@ public class HomeActivity extends Activity {
 		
 		if(state == 0) {
 			
-			Login();
+//			Login();
 			
 		} else {
 		
@@ -369,7 +373,7 @@ public class HomeActivity extends Activity {
 			break;
 			
 		case Setting	:			
-			Intent SettingIntent = new Intent(getApplicationContext(), SystemSettingActivity.class); // Change to SETTING Activity
+			Intent SettingIntent = new Intent(getApplicationContext(), SettingActivity.class); // Change to SETTING Activity
 			startActivity(SettingIntent);
 			break;
 			
