@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class SerialPort {
 	
-	Barcode SerialBarcode;
+	private Barcode SerialBarcode;
 	
 	/* Board Serial set-up */
 	private static FileDescriptor BoardFd;
@@ -21,9 +21,13 @@ public class SerialPort {
 	
 	/* Printer Serial set-up */
 	private static FileDescriptor pFd;
+	private static FileInputStream pFileInputStream;
 	private FileOutputStream pFileOutputStream;
 	
 	private PrinterTxThread pPrinterTxThread;
+	
+	private LabViewTxThread labViewTxThreadObj;
+	public static LabViewRxThread mLabViewRxThread;
 	
 	/* Barcode Serial set-up */
 	private static FileDescriptor BarcodeFd;
@@ -32,7 +36,7 @@ public class SerialPort {
 	
 	public static BarcodeRxThread bBarcodeRxThread;
 	
-	public enum CtrTarget {PhotoSet, TmpSet, TmpCall, MotorSet, AmbientTmpCall, CartCall, DoorCall, MotorStop}
+	public enum CtrTarget {PhotoSet, TmpSet, TmpCall, MotorSet, AmbientTmpCall, CartCall, DoorCall, MotorStop, LabView}
 	public enum RxTarget {Board, Barcode}
 	
 	final static byte STX = 0x02,
@@ -64,9 +68,23 @@ public class SerialPort {
 					   SensorMsgHead = 0,
 					   SensorMsgTail = 0;
 					   
+	private static byte LabViewInputBuffer[] = new byte[BOARD_INPUT_BUFFER],
+						LabViewRxBuffer[][] = new byte[BOARD_INPUT_MASK][BOARD_INPUT_BUFFER];
+
+	private static String LabViewRxData = "",
+						  LabViewMsgBuffer[] = new String[UART_RX_MASK];
+
+	private static int LabViewInputHead = 0,
+					   LabViewInputTail = 0,
+					   LabViewRxHead = 0,
+					   LabViewRxTail = 0,
+					   LabViewMsgHead = 0,
+					   LabViewMsgTail = 0;
+	
 	private static String SensorMsgBuffer[] = new String[UART_RX_MASK];
 	
-	private static boolean BoardRxFlag = false;
+	private static boolean BoardRxFlag = false,
+						   LabViewRxFlag = false;
 	
 	final static byte BARCODE_RX_BUFFER_SIZE = 32,
 					  BARCODE_BUFFER_CNT_SIZE = 16,
@@ -111,6 +129,10 @@ public class SerialPort {
 						BoardFileOutputStream.write(new String("012").getBytes()); // Motor shaking angle, default : 012
 						BoardFileOutputStream.write(new String("R").getBytes());
 						BoardFileOutputStream.write(message.getBytes()); // Motor shaking time, default : 6.5 * 10(sec) = 0065
+						break;
+						
+					case LabView	:
+						BoardFileOutputStream.write(message.getBytes());
 						break;
 						
 					default :
@@ -422,7 +444,18 @@ public class SerialPort {
 							
 							if(tmpData == ETX) {
 								
-								BoardMessageForm(BoardRxData);
+								switch(TestActivity.WhichTest) {
+								
+								case TestActivity.LAB_VIEW	:
+									LabViewTxThread labViewTxThreadObj = new LabViewTxThread(BoardRxData);
+									labViewTxThreadObj.start();
+									break;
+								
+								default	:
+									BoardMessageForm(BoardRxData);
+									break;
+								}
+								
 								BoardRxFlag = false;
 								
 							} else BoardRxData += Character.toString((char) tmpData);	
@@ -500,6 +533,152 @@ public class SerialPort {
 		
 		return SensorMsgBuffer[tmpTail];
 	}
+	
+	public class LabViewTxThread extends Thread { // Instruction for a printer
+		
+		private String txData;
+		
+		LabViewTxThread(String txData) {
+			
+			this.txData = txData;
+		}
+		
+		public void run() {
+			
+			try {
+				
+				pFileOutputStream = new FileOutputStream(pFd);		
+				
+				if (pFileOutputStream != null) {
+					
+					Log.w("LabViewTxThread", "" + txData);
+					pFileOutputStream.write(STX);
+
+					pFileOutputStream.write(txData.getBytes());
+					
+					pFileOutputStream.write(ETX);
+				}					
+						
+			} catch (IOException e) {
+				
+				e.printStackTrace();					
+				return;
+			}
+		}
+	}
+
+	public class LabViewRxThread extends Thread { // Receiving from a board
+		
+		public void run() {
+			
+			while(!isInterrupted()) {
+				Log.w("LabViewRxThread", "interr : " + isInterrupted());
+				int size;
+				
+				try {
+
+					if(pFileInputStream != null) {
+
+						LabViewInputBuffer = new byte[BOARD_INPUT_BUFFER];
+						size = pFileInputStream.read(LabViewInputBuffer);
+						Log.w("LabViewRxThread", "LabViewInputBuffer : " + new String(LabViewInputBuffer));
+						LabViewRxData(size);
+					}
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+					return;
+				}
+			}
+		}
+	}
+	
+	public synchronized void LabViewRxData(int size) {
+		
+		int tmpHead;
+		
+		tmpHead = (LabViewInputHead + 1) % BOARD_INPUT_MASK;
+		
+		if(tmpHead != LabViewInputTail) {
+			
+			for(int i = 0; i < size; i++) { 
+				
+				LabViewRxBuffer[tmpHead][i] = LabViewInputBuffer[i];
+			}
+			
+			if(size != 8) LabViewRxBuffer[tmpHead][size] = 0;
+			
+			LabViewInputHead = tmpHead;
+		}
+	}
+	
+	public byte[] LabViewInputData() {
+		
+		int tmpTail;
+		
+		while(LabViewInputTail == LabViewInputHead);
+		tmpTail = (LabViewInputTail + 1) % BOARD_INPUT_MASK;
+		LabViewInputTail = tmpTail;
+				
+		return LabViewRxBuffer[tmpTail];
+	}
+	
+	public class LabViewRxData extends Thread {
+		
+		public void run() {
+			
+			byte[] tmpBuffer;
+			byte tmpData;
+			
+			while(true) {
+				
+				tmpBuffer = LabViewInputData();
+				
+				for(int i = 0; i < BOARD_INPUT_BUFFER; i++) {
+					
+					tmpData = tmpBuffer[i];
+
+					if(tmpData == 0) break;
+					
+					if(tmpData != STX) {
+						
+						if(LabViewRxFlag) {
+							
+							if(tmpData == ETX) {
+								
+//								LabViewMessageForm(LabViewRxData);
+								BoardTx(LabViewRxData, CtrTarget.LabView);
+								LabViewRxFlag = false;
+								
+							} else LabViewRxData += Character.toString((char) tmpData);	
+						}
+						
+					} else {
+						
+						LabViewRxFlag = true;
+						LabViewRxData = "";
+					}
+				}
+			}
+		}
+	}
+	
+//	public void LabViewMessageForm(String tmpStrData) {
+//		
+//		int tmpHead;
+//			
+//		tmpHead = (LabViewMsgHead + 1) % UART_RX_MASK;
+//		
+//		if(LabViewMsgTail != tmpHead) {
+//			
+//			LabViewMsgBuffer[tmpHead] = tmpStrData;
+//			LabViewMsgHead = tmpHead;
+//			
+//		} else {
+//			
+//		}	
+//	}
 	
 	public class BarcodeRxThread extends Thread { // Receiving from a barcode sensor
 		
@@ -623,7 +802,19 @@ public class SerialPort {
 	public void PrinterSerialInit() {		
 		
 		System.loadLibrary("serial_port");
-		pFd = open("/dev/ttySAC1", 9600, 0);
+		pFd = open("/dev/ttySAC2", 9600, 0);
+	}
+	
+	public void LabViewRxStart() {
+		
+		Log.w("LabViewRx", "Start");
+		pFileInputStream = new FileInputStream(pFd);
+				
+		mLabViewRxThread = new LabViewRxThread();
+		mLabViewRxThread.start();
+		
+		LabViewRxData LabViewRxDataObj = new LabViewRxData();
+		LabViewRxDataObj.start();
 	}
 	
 	public void PrinterTxStart(byte mode, StringBuffer txData) {
@@ -635,7 +826,7 @@ public class SerialPort {
 	public void BarcodeSerialInit() {
 
 		System.loadLibrary("serial_port");
-		BarcodeFd = open("/dev/ttySAC2", 115200, 0);
+		BarcodeFd = open("/dev/ttySAC1", 115200, 0);
 	}
 
 	public void BarcodeRxStart() {

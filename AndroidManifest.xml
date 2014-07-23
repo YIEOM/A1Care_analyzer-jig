@@ -86,6 +86,7 @@
            	    <action android:name=""/>
            	</intent-filter>
     	</activity>
+		<activity android:name="LabViewActivity"></activity>
 		
     </application>
     

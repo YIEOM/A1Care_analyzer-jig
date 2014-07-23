@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 public class RemoveActivity extends Activity {
 
-	SerialPort RemoveSerial;
+	private SerialPort RemoveSerial;
 	
 	final static byte ACTION_ACTIVITY = 1,
 					  HOME_ACTIVITY = 2,
