@@ -28,6 +28,7 @@ public class SerialPort {
 	
 	private LabViewTxThread labViewTxThreadObj;
 	public static LabViewRxThread mLabViewRxThread;
+	public static LabViewRxData LabViewRxDataObj;
 	
 	/* Barcode Serial set-up */
 	private static FileDescriptor BarcodeFd;
@@ -378,7 +379,7 @@ public class SerialPort {
 
 						BoardInputBuffer = new byte[BOARD_INPUT_BUFFER];
 						size = BoardFileInputStream.read(BoardInputBuffer);
-//						Log.w("BoardRxThread", "BoardInputBuffer : " + new String(BoardInputBuffer));
+						Log.w("BoardRxThread", "BoardInputBuffer : " + new String(BoardInputBuffer));
 						BoardRxData(size);
 					}
 					
@@ -549,6 +550,15 @@ public class SerialPort {
 				
 				pFileOutputStream = new FileOutputStream(pFd);		
 				
+				if(txData.equals(RunActivity.HOME_POSITION)) txData = "DO";
+				else if(txData.equals(RunActivity.MEASURE_POSITION)) txData = "DO";
+				else if(txData.equals(RunActivity.Step1st_POSITION)) txData = "DO";
+				else if(txData.equals(RunActivity.Step2nd_POSITION)) txData = "DO";
+				else if(txData.equals(RunActivity.CARTRIDGE_DUMP)) txData = "DO";
+				else if(txData.equals(RunActivity.NEXT_FILTER)) txData = "DO";
+				else if(txData.equals(RunActivity.FILTER_DARK)) txData = "DO";
+				else if(txData.equals("AR")) txData = "FS";
+				
 				if (pFileOutputStream != null) {
 					
 					Log.w("LabViewTxThread", "" + txData);
@@ -572,7 +582,7 @@ public class SerialPort {
 		public void run() {
 			
 			while(!isInterrupted()) {
-				Log.w("LabViewRxThread", "interr : " + isInterrupted());
+//				Log.w("LabViewRxThread", "interr : " + isInterrupted());
 				int size;
 				
 				try {
@@ -631,7 +641,7 @@ public class SerialPort {
 			byte[] tmpBuffer;
 			byte tmpData;
 			
-			while(true) {
+			while(!isInterrupted()) {
 				
 				tmpBuffer = LabViewInputData();
 				
@@ -647,7 +657,6 @@ public class SerialPort {
 							
 							if(tmpData == ETX) {
 								
-//								LabViewMessageForm(LabViewRxData);
 								BoardTx(LabViewRxData, CtrTarget.LabView);
 								LabViewRxFlag = false;
 								
@@ -663,22 +672,6 @@ public class SerialPort {
 			}
 		}
 	}
-	
-//	public void LabViewMessageForm(String tmpStrData) {
-//		
-//		int tmpHead;
-//			
-//		tmpHead = (LabViewMsgHead + 1) % UART_RX_MASK;
-//		
-//		if(LabViewMsgTail != tmpHead) {
-//			
-//			LabViewMsgBuffer[tmpHead] = tmpStrData;
-//			LabViewMsgHead = tmpHead;
-//			
-//		} else {
-//			
-//		}	
-//	}
 	
 	public class BarcodeRxThread extends Thread { // Receiving from a barcode sensor
 		
@@ -807,13 +800,13 @@ public class SerialPort {
 	
 	public void LabViewRxStart() {
 		
-		Log.w("LabViewRx", "Start");
+//		Log.w("LabViewRx", "Start");
 		pFileInputStream = new FileInputStream(pFd);
 				
 		mLabViewRxThread = new LabViewRxThread();
 		mLabViewRxThread.start();
 		
-		LabViewRxData LabViewRxDataObj = new LabViewRxData();
+		LabViewRxDataObj = new LabViewRxData();
 		LabViewRxDataObj.start();
 	}
 	

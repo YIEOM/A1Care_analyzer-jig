@@ -95,13 +95,13 @@ public class BlankActivity extends Activity {
 				
 				case MeasurePosition :
 					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-					BoardMessage(RunActivity.OPERATE_COMPLETE, 5, RunActivity.AnalyzerState.FilterDark);
+					BoardMessage(RunActivity.MEASURE_POSITION, 5, RunActivity.AnalyzerState.FilterDark);
 					BarAnimation(178);
 					break;
 					
 				case FilterDark		:
 					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-					BoardMessage(RunActivity.OPERATE_COMPLETE, 5, RunActivity.AnalyzerState.NoResponse);
+					BoardMessage(RunActivity.FILTER_DARK, 5, RunActivity.AnalyzerState.NoResponse);
 					BarAnimation(206);
 					break;
 				}
@@ -113,29 +113,29 @@ public class BlankActivity extends Activity {
 			
 			/* 535nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(BlankSerial.BoardMessageOutput()));
 			BarAnimation(290);
 			RunActivity.BlankValue[1] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 660nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(BlankSerial.BoardMessageOutput()));
 			BarAnimation(374);
 			RunActivity.BlankValue[2] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 750nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(BlankSerial.BoardMessageOutput()));
 			BarAnimation(458);
 			RunActivity.BlankValue[3] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* Return to the original position */
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(BlankSerial.BoardMessageOutput()));
 			BarAnimation(542);
 			
 			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(BlankSerial.BoardMessageOutput()));
+			while(!RunActivity.HOME_POSITION.equals(BlankSerial.BoardMessageOutput()));
 			
 			BarAnimation(579);
 			

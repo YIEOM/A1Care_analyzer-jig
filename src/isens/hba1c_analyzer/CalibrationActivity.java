@@ -316,36 +316,36 @@ public class CalibrationActivity extends Activity{
 		public void run() {
 			
 			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			/* Dark filter Measurement */
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[0] = 0;
 			RunActivity.BlankValue[0] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 535nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			Log.w("BlankStep", "BlankValue[0] : " + RunActivity.BlankValue[0]);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[1] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 660nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[2] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 750nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[3] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* Return to the original position */
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			
 			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.HOME_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			ThreadRun = false;
 		}
@@ -397,26 +397,26 @@ public class CalibrationActivity extends Activity{
 			else if(targetMode == TargetMode.Full) shkTime = "0630";
 			
 			MotionInstruct(RunActivity.Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.Step1st_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
 			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
 			SerialPort.Sleep(2000);
 				
 			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step1stValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			
 			RunActivity.Step1stValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
 				
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 				
 			RunActivity.Step1stValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
@@ -424,21 +424,21 @@ public class CalibrationActivity extends Activity{
 			AbsorbCal1st();
 			measTarget = MeasTarget.Shk1stOne;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			
 			SerialPort.Sleep(1000);
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step1stValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			
 			RunActivity.Step1stValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			
 			RunActivity.Step1stValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
@@ -446,21 +446,21 @@ public class CalibrationActivity extends Activity{
 			AbsorbCal1st2();
 			measTarget = MeasTarget.Shk1stTwo;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 				
 			SerialPort.Sleep(1000);
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step1stValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			
 			RunActivity.Step1stValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			
 			RunActivity.Step1stValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
@@ -468,7 +468,7 @@ public class CalibrationActivity extends Activity{
 			AbsorbCal1st3();
 			measTarget = MeasTarget.Shk1stThree;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			
 			Cart2ndShaking Cart2ndShakingObj = new Cart2ndShaking();
 			Cart2ndShakingObj.start();	
@@ -485,72 +485,72 @@ public class CalibrationActivity extends Activity{
 			else if(targetMode == TargetMode.Full) shkTime = "0540";
 			
 			MotionInstruct(RunActivity.Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.Step2nd_POSITION.equals(CalibSerial.BoardMessageOutput()));
 						
 			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
 			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
 			SerialPort.Sleep(2000);
 						
 			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			AbsorbCal2nd();
 			measTarget = MeasTarget.Shk2ndOne;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			
 			SerialPort.Sleep(1000);
 						
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			AbsorbCal2nd2();
 			measTarget = MeasTarget.Shk2ndTwo;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 		
 			SerialPort.Sleep(1000);
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
 			RunActivity.Step2ndValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			AbsorbCal2nd3();
 			measTarget = MeasTarget.Shk2ndThree;
 			absorbCheck = true;
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
 			
 			CartDump CartDumpObj = new CartDump();
 			CartDumpObj.start();	
@@ -562,10 +562,10 @@ public class CalibrationActivity extends Activity{
 		public void run() {
 						
 			MotionInstruct(RunActivity.CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.CARTRIDGE_DUMP.equals(CalibSerial.BoardMessageOutput()));
 
 			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+			while(!RunActivity.HOME_POSITION.equals(CalibSerial.BoardMessageOutput()));
 			
 			ThreadRun = false;
 		}

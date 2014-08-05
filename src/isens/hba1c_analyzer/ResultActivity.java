@@ -154,7 +154,7 @@ public class ResultActivity extends Activity {
 		GetCurrTime();
 		
 		double cellBlockTemp = 0,
-				   ambientTemp = 0;
+			   ambientTemp = 0;
 					
 		switch(TestActivity.WhichTest) {
 		

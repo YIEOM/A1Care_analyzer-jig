@@ -90,11 +90,11 @@ public class SystemCheckActivity extends Activity {
 		
 		VolumeInit();
 		
-		TemperatureCheck TemperatureCheckObj = new TemperatureCheck();
-		TemperatureCheckObj.start();
+//		TemperatureCheck TemperatureCheckObj = new TemperatureCheck();
+//		TemperatureCheckObj.start();
 		
-//		SensorCheck SensorCheckObj = new SensorCheck();
-//		SensorCheckObj.start();
+		SensorCheck SensorCheckObj = new SensorCheck();
+		SensorCheckObj.start();
 	}
 	
 	public class SensorCheck extends Thread {
@@ -136,7 +136,7 @@ public class SystemCheckActivity extends Activity {
 				case Step1Position		:
 					MotionInstruct(RunActivity.Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
 					SerialPort.Sleep(200);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.Step1st_POSITION.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.ShakingMotorError;
 						
@@ -156,7 +156,7 @@ public class SystemCheckActivity extends Activity {
 				case Step2Position		:
 					MotionInstruct(RunActivity.Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(200);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.Step2nd_POSITION.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.ShakingMotorError;
 						
@@ -176,7 +176,7 @@ public class SystemCheckActivity extends Activity {
 				case MeasurePosition	:
 					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(1200);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.MEASURE_POSITION.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.ShakingMotorError;
 						
@@ -186,7 +186,7 @@ public class SystemCheckActivity extends Activity {
 				case Filter535nm		:
 					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(1000);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.FilterMotorError;
 						
@@ -196,7 +196,7 @@ public class SystemCheckActivity extends Activity {
 				case Filter660nm		:
 					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(1000);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.FilterMotorError;
 						
@@ -206,7 +206,7 @@ public class SystemCheckActivity extends Activity {
 				case Filter750nm		:
 					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(1000);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.FilterMotorError;
 						
@@ -225,7 +225,7 @@ public class SystemCheckActivity extends Activity {
 				case FilterDark			:
 					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(400);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.FILTER_DARK.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.FilterMotorError;
 						
@@ -235,7 +235,7 @@ public class SystemCheckActivity extends Activity {
 				case CartridgeDump		:
 					MotionInstruct(RunActivity.CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(6000);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.CARTRIDGE_DUMP.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.ShakingMotorError;
 											
@@ -245,7 +245,7 @@ public class SystemCheckActivity extends Activity {
 				case HomePosition		:
 					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
 					SerialPort.Sleep(1300);
-					if(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput())) {
+					if(!RunActivity.HOME_POSITION.equals(SystemSerial.BoardMessageOutput())) {
 						
 						State = CheckState.ShakingMotorError;
 						
@@ -372,22 +372,22 @@ public class SystemCheckActivity extends Activity {
 		public void run() {
 			
 			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.MEASURE_POSITION.equals(SystemSerial.BoardMessageOutput()));
 				
 			for(int i = 0; i < 5; i++) {
 			
 				MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-				while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+				while(!RunActivity.FILTER_DARK.equals(SystemSerial.BoardMessageOutput()));
 				
 				MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-				while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+				while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 			
 				RunActivity.BlankValue[1] = AbsorbanceMeasure(); // 535nm Absorbance
 				
 //				Log.w("PhotoCheck", "535nm blank : " + RunActivity.BlankValue[1]);
 				
 				MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-				while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+				while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 				
 //				AbsorbanceMeasure();
 				
@@ -396,7 +396,7 @@ public class SystemCheckActivity extends Activity {
 //				Log.w("PhotoCheck", "660nm blank : " + RunActivity.BlankValue[2]);
 				
 				MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-				while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+				while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 				
 //				AbsorbanceMeasure();
 				
@@ -415,34 +415,34 @@ public class SystemCheckActivity extends Activity {
 		public void run() {
 			
 			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.MEASURE_POSITION.equals(SystemSerial.BoardMessageOutput()));
 			
 			/* Dark filter Measurement */
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(SystemSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[0] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 535nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[1] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 660nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[2] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* 750nm filter Measurement */
 			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.NEXT_FILTER.equals(SystemSerial.BoardMessageOutput()));
 			RunActivity.BlankValue[3] = AbsorbanceMeasure(); // Dark Absorbance
 			
 			/* Return to the original position */
 			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.FILTER_DARK.equals(SystemSerial.BoardMessageOutput()));
 			
 			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.OPERATE_COMPLETE.equals(SystemSerial.BoardMessageOutput()));
+			while(!RunActivity.HOME_POSITION.equals(SystemSerial.BoardMessageOutput()));
 			
 			SerialPort.Sleep(1000);
 						

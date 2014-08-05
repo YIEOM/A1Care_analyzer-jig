@@ -41,7 +41,7 @@ public class RunActivity extends Activity {
 						FILTER_660nm     = "FG", //AG
 						FILTER_750nm     = "FB", //AB	
 						OPERATE_COMPLETE = "DO",
-						MOTOR_COMPLETE   = "FS",
+						MOTOR_COMPLETE   = "AR",
 						NEXT_FILTER		 = "FS",
 						MOTOR_STOP		 = "MS";
 	
@@ -217,7 +217,7 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
 			BarAnimation(168);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!Step1st_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(171);
 			SerialPort.Sleep(500);
 			
@@ -250,32 +250,32 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(285);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!MEASURE_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(288);
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(291);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(294);
 			Step1stValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(297);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(300);
 			
 			Step1stValue1[1] = AbsorbanceMeasure(); // 660nm Absorbance
 		
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(303);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(306);
 			
 			Step1stValue1[2] = AbsorbanceMeasure(); // 750nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(309);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(312);
 					
 			if(!CartStepStopped) {
@@ -299,27 +299,27 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(318);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(321);
 			Step1stValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(324);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(327);
 			
 			Step1stValue2[1] = AbsorbanceMeasure(); // 660nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(330);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(333);
 			
 			Step1stValue2[2] = AbsorbanceMeasure(); // 750nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(336);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(339);
 				
 			if(!CartStepStopped) {
@@ -343,27 +343,27 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(345);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(348);
 			Step1stValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(351);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(354);
 			
 			Step1stValue3[1] = AbsorbanceMeasure(); // 660nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(357);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(360);
 			
 			Step1stValue3[2] = AbsorbanceMeasure(); // 750nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(363);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(366);
 				
 			if(!CartStepStopped) {
@@ -384,7 +384,7 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(369);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!Step2nd_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(372);
 						
 			MotionInstruct(ShkDf.format(SECOND_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
@@ -416,30 +416,30 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(490);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!MEASURE_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(493);
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(496);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(499);
 			Step2ndValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(502);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(505);
 			Step2ndValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(508);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(511);
 			Step2ndValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(514);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(517);
 			
 			if(!CartStepStopped) {
@@ -463,25 +463,25 @@ public class RunActivity extends Activity {
 						
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(523);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(526);
 			Step2ndValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(529);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(532);
 			Step2ndValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(535);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(538);
 			Step2ndValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(541);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(544);
 			
 			if(!CartStepStopped) {
@@ -505,25 +505,25 @@ public class RunActivity extends Activity {
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(550);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(553);
 			Step2ndValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(556);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(559);
 			Step2ndValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(562);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!NEXT_FILTER.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(565);
 			Step2ndValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(568);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(571);
 			
 			if(!CartStepStopped) {
@@ -544,12 +544,12 @@ public class RunActivity extends Activity {
 						
 			MotionInstruct(CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(574);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!CARTRIDGE_DUMP.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(577);
 
 			MotionInstruct(HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
 			BarAnimation(580);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!HOME_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(583);
 
 			HbA1cCalculate();
@@ -571,13 +571,13 @@ public class RunActivity extends Activity {
 			SerialPort.Sleep(500);
 			
 			MotionInstruct(FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!FILTER_DARK.equals(RunSerial.BoardMessageOutput()));
 			
 			MotionInstruct(CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);		
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!CARTRIDGE_DUMP.equals(RunSerial.BoardMessageOutput()));
 
 			MotionInstruct(HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!OPERATE_COMPLETE.equals(RunSerial.BoardMessageOutput()));
+			while(!HOME_POSITION.equals(RunSerial.BoardMessageOutput()));
 			
 			switch(whichState) {
 			
