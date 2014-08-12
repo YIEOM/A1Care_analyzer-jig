@@ -86,6 +86,11 @@
            	    <action android:name=""/>
            	</intent-filter>
     	</activity>
+    	<activity android:name="PhotoActivity">
+    	    <intent-filter >
+           	    <action android:name=""/>
+           	</intent-filter>
+    	</activity>
 		<activity android:name="LabViewActivity"></activity>
 		
     </application>

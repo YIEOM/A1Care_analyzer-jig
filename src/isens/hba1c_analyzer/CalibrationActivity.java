@@ -14,6 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import isens.hba1c_analyzer.HomeActivity.TargetIntent;
+import isens.hba1c_analyzer.RunActivity.AnalyzerState;
+import isens.hba1c_analyzer.RunActivity.Cart1stFilter1;
+import isens.hba1c_analyzer.RunActivity.Cart1stFilter2;
+import isens.hba1c_analyzer.RunActivity.Cart1stFilter3;
+import isens.hba1c_analyzer.RunActivity.Cart2ndFilter1;
+import isens.hba1c_analyzer.RunActivity.Cart2ndFilter2;
+import isens.hba1c_analyzer.RunActivity.Cart2ndFilter3;
+import isens.hba1c_analyzer.RunActivity.Cart2ndShaking;
+import isens.hba1c_analyzer.RunActivity.CartDump;
+import isens.hba1c_analyzer.RunActivity.ShakingAniThread;
 import isens.hba1c_analyzer.SerialPort.CtrTarget;
 import isens.hba1c_analyzer.TimerDisplay.whichClock;
 
@@ -63,8 +73,11 @@ public class CalibrationActivity extends Activity{
 	private TargetMode targetMode = null;
 	private MeasTarget measTarget = null;
 	
+	private RunActivity.AnalyzerState calibState;
+	
 	private static TextView TimeText;
-	private boolean absorbCheck = false;
+	private boolean absorbCheck = false,
+					btnState = false;
 	
 	DecimalFormat AbsorbanceFormat = new DecimalFormat("0.0000"),
 				  hbA1cFormat = new DecimalFormat("0.00"),
@@ -125,8 +138,14 @@ public class CalibrationActivity extends Activity{
 			public void onClick(View v) {
 			
 				blankBtn.setEnabled(false);
+				Log.w("blankBtn", "false");
 				
-				BlankMode();
+				if(!btnState) {
+					
+					btnState = true;
+
+					BlankMode();
+				}
 			}
 		});
 		
@@ -285,8 +304,28 @@ public class CalibrationActivity extends Activity{
 		
 		SerialPort.Sleep(300);
 		
-		deviceState.setTextColor(Color.parseColor("#565656"));
-		deviceState.setText("READY");
+		switch(calibState) {
+		
+		case NormalOperation	:
+			deviceState.setTextColor(Color.parseColor("#565656"));
+			deviceState.setText("READY");
+			break;
+			
+		case ShakingMotorError	:
+			deviceState.setTextColor(Color.parseColor("#FF0000"));
+			deviceState.setText("SHAKING ERROR");
+			break;
+			
+		case FilterMotorError	:
+			deviceState.setTextColor(Color.parseColor("#FF0000"));
+			deviceState.setText("FILTER ERROR");
+			break;
+			
+		default	:
+			break;
+		}
+		
+		btnState = false;
 		
 		blankBtn.setEnabled(true);
 		scanBtn.setEnabled(true);
@@ -303,6 +342,7 @@ public class CalibrationActivity extends Activity{
 		fullBtn.setEnabled(false);
 		
 		targetMode = TargetMode.Blank;
+		calibState = AnalyzerState.InitPosition;
 		ThreadRun = true;
 		
 		TimerInit();
@@ -315,37 +355,69 @@ public class CalibrationActivity extends Activity{
 		
 		public void run() {
 			
-			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
-			
-			/* Dark filter Measurement */
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.BlankValue[0] = 0;
-			RunActivity.BlankValue[0] = AbsorbanceMeasure(); // Dark Absorbance
-			
-			/* 535nm filter Measurement */
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			Log.w("BlankStep", "BlankValue[0] : " + RunActivity.BlankValue[0]);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.BlankValue[1] = AbsorbanceMeasure(); // Dark Absorbance
-			
-			/* 660nm filter Measurement */
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.BlankValue[2] = AbsorbanceMeasure(); // Dark Absorbance
-			
-			/* 750nm filter Measurement */
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.BlankValue[3] = AbsorbanceMeasure(); // Dark Absorbance
-			
-			/* Return to the original position */
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			
-			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.HOME_POSITION.equals(CalibSerial.BoardMessageOutput()));
+			for(int i = 0; i < 9; i++) {
+				
+				switch(calibState) {
+				
+				case InitPosition		:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.MeasurePosition, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break; 
+				
+				case MeasurePosition :
+					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.MEASURE_POSITION, AnalyzerState.FilterDark, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case FilterDark :
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Filter535nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.BlankValue[0] = 0;
+					RunActivity.BlankValue[0] = AbsorbanceMeasure(); // Dark Absorbance
+					break;
+					
+				case Filter535nm :
+					/* 535nm filter Measurement */
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.BlankValue[1] = AbsorbanceMeasure(); // Dark Absorbance
+					break;
+				
+				case Filter660nm :
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.BlankValue[2] = AbsorbanceMeasure(); // Dark Absorbance
+					break;
+				
+				case Filter750nm :
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterHome, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.BlankValue[3] = AbsorbanceMeasure(); // Dark Absorbance
+					break;
+				
+				case FilterHome :
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.CartridgeHome, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					break;
+				
+				case CartridgeHome :
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NormalOperation, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				default	:
+					break;
+				}
+			}
 			
 			ThreadRun = false;
 		}
@@ -359,6 +431,7 @@ public class CalibrationActivity extends Activity{
 		escBtn.setEnabled(false);
 		
 		targetMode = TargetMode.Quick;
+		calibState = AnalyzerState.InitPosition;
 		ThreadRun = true;
 		
 		AbsorbanceDisplay();
@@ -377,6 +450,7 @@ public class CalibrationActivity extends Activity{
 		escBtn.setEnabled(false);
 		
 		targetMode = TargetMode.Full;
+		calibState = AnalyzerState.InitPosition;
 		ThreadRun = true;
 		
 		AbsorbanceDisplay();
@@ -387,187 +461,713 @@ public class CalibrationActivity extends Activity{
 		BlankCart1stShakingObj.start();
 	}
 	
+//	public class Cart1stShaking extends Thread { // First shaking motion
+//		
+//		public void run() {
+//						
+//			String shkTime = "0000";
+//			
+//			if(targetMode == TargetMode.Quick) shkTime = "0030";
+//			else if(targetMode == TargetMode.Full) shkTime = "0630";
+//			
+//			MotionInstruct(RunActivity.Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
+//			while(!RunActivity.Step1st_POSITION.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
+//			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+//			SerialPort.Sleep(2000);
+//				
+//			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step1stValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			RunActivity.Step1stValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//				
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//				
+//			RunActivity.Step1stValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal1st();
+//			measTarget = MeasTarget.Shk1stOne;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			SerialPort.Sleep(1000);
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step1stValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			RunActivity.Step1stValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			RunActivity.Step1stValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal1st2();
+//			measTarget = MeasTarget.Shk1stTwo;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//				
+//			SerialPort.Sleep(1000);
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step1stValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			RunActivity.Step1stValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			RunActivity.Step1stValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal1st3();
+//			measTarget = MeasTarget.Shk1stThree;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			Cart2ndShaking Cart2ndShakingObj = new Cart2ndShaking();
+//			Cart2ndShakingObj.start();	
+//		}
+//	}
+	
 	public class Cart1stShaking extends Thread { // First shaking motion
-		
+
 		public void run() {
-						
+			
 			String shkTime = "0000";
 			
 			if(targetMode == TargetMode.Quick) shkTime = "0030";
 			else if(targetMode == TargetMode.Full) shkTime = "0630";
 			
-			MotionInstruct(RunActivity.Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
-			while(!RunActivity.Step1st_POSITION.equals(CalibSerial.BoardMessageOutput()));
-			
-			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
-			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
-			SerialPort.Sleep(2000);
+			for(int i = 0; i < 3; i++) {
 				
-			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step1stValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			
-			RunActivity.Step1stValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
+				switch(calibState) {
 				
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+				case InitPosition		:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.Step1Position, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
 				
-			RunActivity.Step1stValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
+				case Step1Position	:
+					MotionInstruct(RunActivity.Step1st_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.Step1st_POSITION, AnalyzerState.Step1Shaking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					SerialPort.Sleep(500);
+					break;
+					
+				case Step1Shaking	:
+					MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
+					BoardMessage(RunActivity.MOTOR_COMPLETE, AnalyzerState.MeasurePosition, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				default	:
+					break;
+				}
+			}
 			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal1st();
-			measTarget = MeasTarget.Shk1stOne;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			
-			SerialPort.Sleep(1000);
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step1stValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			
-			RunActivity.Step1stValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			
-			RunActivity.Step1stValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal1st2();
-			measTarget = MeasTarget.Shk1stTwo;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+			if(calibState == AnalyzerState.MeasurePosition) {
 				
-			SerialPort.Sleep(1000);
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step1stValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			
-			RunActivity.Step1stValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			
-			RunActivity.Step1stValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal1st3();
-			measTarget = MeasTarget.Shk1stThree;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			
-			Cart2ndShaking Cart2ndShakingObj = new Cart2ndShaking();
-			Cart2ndShakingObj.start();	
+				Cart1stFilter1 Cart1stFilter1Obj = new Cart1stFilter1();
+				Cart1stFilter1Obj.start();	
+			}
 		}
 	}
+
+	public class Cart1stFilter1 extends Thread { // First filter motion of first shaking 
+
+		public void run() {
+
+			SerialPort.Sleep(2000);
+			
+			for(int i = 0; i < 5; i++) {
+				
+				switch(calibState) {
+				
+				case MeasurePosition	:
+					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.MEASURE_POSITION, AnalyzerState.Filter535nm, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue1[1] = AbsorbanceMeasure(); // 660nm Absorbance
+					break;
+					
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue1[2] = AbsorbanceMeasure(); // 750nm Absorbance
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Filter535nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal1st();
+					measTarget = MeasTarget.Shk1stOne;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
+			
+			if(calibState == AnalyzerState.Filter535nm) {
+				
+				Cart1stFilter2 Cart1stFilter2Obj = new Cart1stFilter2();
+				Cart1stFilter2Obj.start();	
+			}
+		}
+	}
+
+	public class Cart1stFilter2 extends Thread { // Second filter motion of first shaking
+
+		public void run() {
+			
+			SerialPort.Sleep(1000);
+			
+			for(int i = 0; i < 4; i++) {
+				
+				switch(calibState) {
+				
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue2[1] = AbsorbanceMeasure(); // 660nm Absorbance
+					break;
+					
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue2[2] = AbsorbanceMeasure(); // 750nm Absorbance
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Filter535nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal1st2();
+					measTarget = MeasTarget.Shk1stTwo;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
+			
+			if(calibState == AnalyzerState.Filter535nm) {
+				
+				Cart1stFilter3 Cart1stFilter3Obj = new Cart1stFilter3();
+				Cart1stFilter3Obj.start();
+			}
+		}
+	}
+	
+	public class Cart1stFilter3 extends Thread { // Third filter motion of first shaking
+
+		public void run() {
+			
+			SerialPort.Sleep(1000);
+			
+			for(int i = 0; i < 4; i++) {
+				
+				switch(calibState) {
+				
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue3[1] = AbsorbanceMeasure(); // 750nm Absorbance
+					break;
+					
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step1stValue3[2] = AbsorbanceMeasure(); // 750nm Absorbance
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Step2Position, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal1st3();
+					measTarget = MeasTarget.Shk1stThree;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
+			
+			if(calibState == AnalyzerState.Step2Position) {
+				
+				Cart2ndShaking Cart2ndShakingObj = new Cart2ndShaking();
+				Cart2ndShakingObj.start();	
+			}
+		}
+	}
+	
+//	public class Cart2ndShaking extends Thread { // Second shaking motion
+//		
+//		public void run() {			
+//		
+//			String shkTime = "0000";
+//			
+//			if(targetMode == TargetMode.Quick) shkTime = "0030";
+//			else if(targetMode == TargetMode.Full) shkTime = "0540";
+//			
+//			MotionInstruct(RunActivity.Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.Step2nd_POSITION.equals(CalibSerial.BoardMessageOutput()));
+//						
+//			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
+//			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
+//			SerialPort.Sleep(2000);
+//						
+//			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal2nd();
+//			measTarget = MeasTarget.Shk2ndOne;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			SerialPort.Sleep(1000);
+//						
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal2nd2();
+//			measTarget = MeasTarget.Shk2ndTwo;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//		
+//			SerialPort.Sleep(1000);
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
+//			RunActivity.Step2ndValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
+//			
+//			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+//			AbsorbCal2nd3();
+//			measTarget = MeasTarget.Shk2ndThree;
+//			absorbCheck = true;
+//			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			CartDump CartDumpObj = new CartDump();
+//			CartDumpObj.start();	
+//		}
+//	}
 	
 	public class Cart2ndShaking extends Thread { // Second shaking motion
 		
 		public void run() {			
-		
+			
 			String shkTime = "0000";
 			
 			if(targetMode == TargetMode.Quick) shkTime = "0030";
 			else if(targetMode == TargetMode.Full) shkTime = "0540";
 			
-			MotionInstruct(RunActivity.Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.Step2nd_POSITION.equals(CalibSerial.BoardMessageOutput()));
-						
-			MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
-			while(!RunActivity.MOTOR_COMPLETE.equals(CalibSerial.BoardMessageOutput()));
-			SerialPort.Sleep(2000);
-						
-			MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.MEASURE_POSITION.equals(CalibSerial.BoardMessageOutput()));
+			for(int i = 0; i < 2; i++) {
+				
+				switch(calibState) {
+				
+				case Step2Position	:
+					MotionInstruct(RunActivity.Step2nd_POSITION, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.Step2nd_POSITION, AnalyzerState.Step2Shaking, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					SerialPort.Sleep(500);
+					break;
+					
+				case Step2Shaking	:
+					MotionInstruct(shkTime, SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
+					BoardMessage(RunActivity.MOTOR_COMPLETE, AnalyzerState.MeasurePosition, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
 			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue1[1] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue1[2] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal2nd();
-			measTarget = MeasTarget.Shk2ndOne;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			
-			SerialPort.Sleep(1000);
-						
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal2nd2();
-			measTarget = MeasTarget.Shk2ndTwo;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-		
-			SerialPort.Sleep(1000);
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.NEXT_FILTER.equals(CalibSerial.BoardMessageOutput()));
-			RunActivity.Step2ndValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
-			
-			MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
-			AbsorbCal2nd3();
-			measTarget = MeasTarget.Shk2ndThree;
-			absorbCheck = true;
-			while(!RunActivity.FILTER_DARK.equals(CalibSerial.BoardMessageOutput()));
-			
-			CartDump CartDumpObj = new CartDump();
-			CartDumpObj.start();	
+			if(calibState == AnalyzerState.MeasurePosition) {
+				
+				Cart2ndFilter1 Cart2ndFilter1Obj = new Cart2ndFilter1();
+				Cart2ndFilter1Obj.start();
+			}
 		}
 	}
+	
+	public class Cart2ndFilter1 extends Thread { // First filter motion of second shaking
+		
+		public void run() {			
+
+			SerialPort.Sleep(2000);
+			
+			for(int i = 0; i < 5; i++) {
+				
+				switch(calibState) {
+				
+				case MeasurePosition	:
+					MotionInstruct(RunActivity.MEASURE_POSITION, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.MEASURE_POSITION, AnalyzerState.Filter535nm, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue1[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue1[1] = AbsorbanceMeasure(); // 660nm Absorbance
+					break;
+				
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue1[2] = AbsorbanceMeasure(); // 750nm Absorbance
+					break;
+				
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Filter535nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal2nd();
+					measTarget = MeasTarget.Shk2ndOne;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
+			
+			if(calibState == AnalyzerState.Filter535nm) {
+			
+				Cart2ndFilter2 Cart2ndFilter2Obj = new Cart2ndFilter2();
+				Cart2ndFilter2Obj.start();
+			}
+		}
+	}
+	
+	public class Cart2ndFilter2 extends Thread { // Second filter motion of second shaking
+		
+		public void run() {
+			
+			SerialPort.Sleep(1000);
+						
+			for(int i = 0; i < 4; i++) {
+				
+				switch(calibState) {
+				
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue2[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue2[1] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue2[2] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.Filter535nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal2nd2();
+					measTarget = MeasTarget.Shk2ndTwo;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
+		
+			if(calibState == AnalyzerState.Filter535nm) {
+					
+				Cart2ndFilter3 Cart2ndFilter3Obj = new Cart2ndFilter3();
+				Cart2ndFilter3Obj.start();
+			}
+		}
+	}
+	
+	public class Cart2ndFilter3 extends Thread { // Third filter motion of second shaking
+		
+		public void run() {
+			
+			SerialPort.Sleep(1000);
+			
+			for(int i = 0; i < 4; i++) {
+				
+				switch(calibState) {
+				
+				case Filter535nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter660nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue3[0] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter660nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.Filter750nm, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue3[1] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case Filter750nm	:
+					MotionInstruct(RunActivity.NEXT_FILTER, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.NEXT_FILTER, AnalyzerState.FilterDark, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					RunActivity.Step2ndValue3[2] = AbsorbanceMeasure(); // 535nm Absorbance
+					break;
+					
+				case FilterDark		:
+					MotionInstruct(RunActivity.FILTER_DARK, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.FILTER_DARK, AnalyzerState.CartridgeDump, RunActivity.FILTER_ERROR, AnalyzerState.FilterMotorError);
+					AbsorbCal2nd3();
+					measTarget = MeasTarget.Shk2ndThree;
+					absorbCheck = true;
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}			
+			
+			if(calibState == AnalyzerState.CartridgeDump) {
+				
+				CartDump CartDumpObj = new CartDump();
+				CartDumpObj.start();
+			}
+		}
+	}
+		
+//	public class CartDump extends Thread { // Cartridge dumping motion
+//		
+//		public void run() {
+//						
+//			MotionInstruct(RunActivity.CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.CARTRIDGE_DUMP.equals(CalibSerial.BoardMessageOutput()));
+//
+//			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
+//			while(!RunActivity.HOME_POSITION.equals(CalibSerial.BoardMessageOutput()));
+//			
+//			ThreadRun = false;
+//		}
+//	}
 	
 	public class CartDump extends Thread { // Cartridge dumping motion
 		
 		public void run() {
-						
-			MotionInstruct(RunActivity.CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.CARTRIDGE_DUMP.equals(CalibSerial.BoardMessageOutput()));
-
-			MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
-			while(!RunActivity.HOME_POSITION.equals(CalibSerial.BoardMessageOutput()));
+		
+			for(int i = 0; i < 2; i++) {
+				
+				switch(calibState) {
+				
+				case CartridgeDump	:
+					MotionInstruct(RunActivity.CARTRIDGE_DUMP, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.CARTRIDGE_DUMP, AnalyzerState.CartridgeHome, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case CartridgeHome	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.Step1Position, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case ShakingMotorError	:
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				case FilterMotorError	:
+					MotionInstruct(RunActivity.HOME_POSITION, SerialPort.CtrTarget.PhotoSet);			
+					BoardMessage(RunActivity.HOME_POSITION, AnalyzerState.NoWorking, RunActivity.CARTRIDGE_ERROR, AnalyzerState.ShakingMotorError);
+					break;
+					
+				case NoResponse :
+					calibState = AnalyzerState.NoWorking;
+					break;
+					
+				default	:
+					break;
+				}
+			}
 			
-			ThreadRun = false;
+			if(calibState == AnalyzerState.Step1Position) {
+				
+				ThreadRun = false;
+			}
 		}
 	}
 	
@@ -804,15 +1404,48 @@ public class CalibrationActivity extends Activity{
 	
 	public synchronized double AbsorbanceMeasure() { // Absorbance measurement
 		
+		int time = 0;
 		String rawValue;
 		double douValue = 0;
 		
 		CalibSerial.BoardTx("VH", SerialPort.CtrTarget.PhotoSet);
-			
+		
 		rawValue = CalibSerial.BoardMessageOutput();			
+		
+		while(rawValue.length() != 8) {
+		
+			rawValue = CalibSerial.BoardMessageOutput();			
+		
+			SerialPort.Sleep(100);
+		}	
+					
 		douValue = Double.parseDouble(rawValue);
 		
 		return (douValue - RunActivity.BlankValue[0]);
+	}
+	
+	public void BoardMessage(String colRsp, AnalyzerState nextState, String errRsp, AnalyzerState errState) {
+		
+		int time = 0;
+		String temp = "";
+		
+		while(true) {
+			
+			temp = CalibSerial.BoardMessageOutput();
+			
+			if(colRsp.equals(temp)) {
+				
+				calibState = nextState;
+				break;			
+				
+			} else if(errRsp.equals(temp)) {
+				
+				calibState = errState;
+				break;
+			}
+			
+			SerialPort.Sleep(100);
+		}
 	}
 	
 	public synchronized void HbA1cCalculation() {

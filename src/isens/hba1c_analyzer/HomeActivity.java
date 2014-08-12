@@ -69,7 +69,7 @@ public class HomeActivity extends Activity {
 							  Time, Display, HIS, HISSetting, Export, Maintenance, FileSave, 
 							  ControlFileLoad, PatientFileLoad, NextFile, PreFile, Adjustment, Sound, 
 							  Calibration, Language, Correlation, Temperature, LabView, Stability, 
-							  Temp, Test}
+							  Temp, Test, Photo}
 	
 	private static TextView TimeText;
 	

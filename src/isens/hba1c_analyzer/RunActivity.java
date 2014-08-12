@@ -31,21 +31,23 @@ public class RunActivity extends Activity {
 	
 	/* Instruction to motor for filter */
 	final static String HOME_POSITION    = "CH", //CO
-						MEASURE_POSITION = "CM", //MO
-						Step1st_POSITION = "C1",
-						Step2nd_POSITION = "C2",
-						CARTRIDGE_DUMP   = "CD",
-						FILTER_DARK      = "FD", //DO
-						FILTER_SPto535nm = "FR", //RO
-						FILTER_535nm     = "AR", 
-						FILTER_660nm     = "FG", //AG
-						FILTER_750nm     = "FB", //AB	
-						OPERATE_COMPLETE = "DO",
-						MOTOR_COMPLETE   = "AR",
-						NEXT_FILTER		 = "FS",
-						MOTOR_STOP		 = "MS";
+			MEASURE_POSITION = "CM", //MO
+			Step1st_POSITION = "C1",
+			Step2nd_POSITION = "C2",
+			CARTRIDGE_DUMP   = "CD",
+			FILTER_DARK      = "FD", //DO
+			FILTER_SPto535nm = "FR", //RO
+			FILTER_535nm     = "AR", 
+			FILTER_660nm     = "FG", //AG
+			FILTER_750nm     = "FB", //AB	
+			OPERATE_COMPLETE = "DO",
+			MOTOR_COMPLETE   = "AR",
+			NEXT_FILTER		 = "FS",
+			MOTOR_STOP		 = "MS",
+			FILTER_ERROR 	 = "FE1",
+			CARTRIDGE_ERROR	 = "CE1";
 	
-	public enum AnalyzerState {MeasurePosition, FilterDark, Filter535nm, Filter660nm, Filter750nm, FilterHome, CartridgeHome, NoResponse}
+	public enum AnalyzerState {InitPosition, Step1Position, Step1Shaking, Step2Position, Step2Shaking, MeasurePosition, FilterDark, Filter535nm, Filter660nm, Filter750nm, FilterHome, CartridgeHome, CartridgeDump, MeasureDark, Measure535nm, Measure660nm, Measure750nm, NoResponse, NoWorking, ShakingMotorError, FilterMotorError, PhotoSensorError, LampError, NormalOperation}
 
 	private DecimalFormat ShkDf = new DecimalFormat("0000");
 	

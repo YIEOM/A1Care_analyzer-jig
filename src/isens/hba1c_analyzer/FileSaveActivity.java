@@ -47,18 +47,35 @@ public class FileSaveActivity extends Activity {
 	
 	public void DataInit() {
 		
-		DataArray();
-		
 		SaveData = new DataStorage();
+		
+		itn = getIntent();
+		
+		whichState = itn.getIntExtra("WhichIntent", 0);
 		
 		switch(whichState) {
 		
 		case 6	:
+			DataArrayPhotoTemp();
+			
 			SaveData.PhotoTempSave(overallData, historyData);
 			break;
 			
+		case 8	:
+			DataArrayTemp();
+			
+			SaveData.TestSave("/TempData", overallData);
+			break;
+			
+		case 9	:
+			DataArrayPhoto();
+			
+			SaveData.TestSave("/PhotoData", overallData);
+			break;
+			
 		default	:
-			itn = getIntent();
+			DataArray();
+			
 			dataType = itn.getStringExtra("RefNumber").substring(0, 1);
 			
 			if(itn.getIntExtra("RunState", 0) == (int) NORMAL_RESULT) {
@@ -88,45 +105,64 @@ public class FileSaveActivity extends Activity {
 		historyData.delete(0, historyData.capacity());
 		
 		itn = getIntent();
-				
-		whichState = itn.getIntExtra("WhichIntent", 0);
 		
-		switch(whichState) {
-		
-		case 6	: // Photo Temp test
-			overallData.append(itn.getStringExtra("Year"));
-			overallData.append(itn.getStringExtra("Month"));
-			overallData.append(itn.getStringExtra("Day"));
-			overallData.append(itn.getStringExtra("AmPm"));
-			overallData.append(itn.getStringExtra("Hour"));
-			overallData.append(itn.getStringExtra("Minute"));
-			overallData.append(itn.getStringExtra("Hba1cPct"));			
-						
-			for(int i = 0; i < 5; i++) {
-				
-				historyData.append(itn.getStringExtra("CellBlockTemp1" + Integer.toString(i)) + "\t");
-				historyData.append(itn.getStringExtra("CellBlockTemp2" + Integer.toString(i)) + "\t");
-				historyData.append(itn.getStringExtra("CellBlockTemp3" + Integer.toString(i)) + "\t");
-				historyData.append(itn.getStringExtra("AmbientTemp1" + Integer.toString(i)) + "\t");
-				historyData.append(itn.getStringExtra("AmbientTemp2" + Integer.toString(i)) + "\t");
-				historyData.append(itn.getStringExtra("AmbientTemp3" + Integer.toString(i)) + "\t");
-			}
-			break;
-			
-		default	:
-			DataCnt = itn.getIntExtra("DataCnt", 0);
-			dataType = itn.getStringExtra("RefNumber").substring(0, 1);
+		DataCnt = itn.getIntExtra("DataCnt", 0);
+		dataType = itn.getStringExtra("RefNumber").substring(0, 1);
 
-			overallData.append(itn.getStringExtra("Year"));
-			overallData.append(itn.getStringExtra("Month"));
-			overallData.append(itn.getStringExtra("Day"));
-			overallData.append(itn.getStringExtra("AmPm"));
-			overallData.append(itn.getStringExtra("Hour"));
-			overallData.append(itn.getStringExtra("Minute"));
-			overallData.append(dfm.format(DataCnt));
-			overallData.append(itn.getStringExtra("RefNumber"));
-			overallData.append(itn.getStringExtra("Hba1cPct"));			
-			break;
+		overallData.append(itn.getStringExtra("Year"));
+		overallData.append(itn.getStringExtra("Month"));
+		overallData.append(itn.getStringExtra("Day"));
+		overallData.append(itn.getStringExtra("AmPm"));
+		overallData.append(itn.getStringExtra("Hour"));
+		overallData.append(itn.getStringExtra("Minute"));
+		overallData.append(dfm.format(DataCnt));
+		overallData.append(itn.getStringExtra("RefNumber"));
+		overallData.append(itn.getStringExtra("Hba1cPct"));			
+		
+		historyData.append(itn.getIntExtra("RunMin", 0) + "\t");
+		historyData.append(itn.getIntExtra("RunSec", 0) + "\t");
+		historyData.append(itn.getStringExtra("BlankVal0") + "\t");
+		historyData.append(itn.getStringExtra("BlankVal1") + "\t");
+		historyData.append(itn.getStringExtra("BlankVal2") + "\t");
+		historyData.append(itn.getStringExtra("BlankVal3") + "\t");
+		
+		for(int i = 0; i < 3; i++) {
+			
+			historyData.append(itn.getStringExtra("St1Abs1by" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("St1Abs2by" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("St1Abs3by" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("St2Abs1by" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("St2Abs2by" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("St2Abs3by" + Integer.toString(i)) + "\t");
+		}
+	}
+	
+	public void DataArrayPhotoTemp() {
+		
+		DecimalFormat dfm = new DecimalFormat("0000");
+		
+		overallData.delete(0, overallData.capacity());
+		historyData.delete(0, historyData.capacity());
+		
+		itn = getIntent();
+		
+		overallData.append(itn.getStringExtra("Year"));
+		overallData.append(itn.getStringExtra("Month"));
+		overallData.append(itn.getStringExtra("Day"));
+		overallData.append(itn.getStringExtra("AmPm"));
+		overallData.append(itn.getStringExtra("Hour"));
+		overallData.append(itn.getStringExtra("Minute"));
+		overallData.append(itn.getStringExtra("Hba1cPct"));			
+					
+		for(int i = 0; i < 5; i++) {
+			
+			historyData.append(itn.getStringExtra("CellBlockTemp1" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("CellBlockTemp2" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("CellBlockTemp3" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("AmbientTemp1" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("AmbientTemp2" + Integer.toString(i)) + "\t");
+			historyData.append(itn.getStringExtra("AmbientTemp3" + Integer.toString(i)) + "\t");
+
 		}
 		
 		historyData.append(itn.getIntExtra("RunMin", 0) + "\t");
@@ -147,22 +183,70 @@ public class FileSaveActivity extends Activity {
 		}
 	}
 	
+	public void DataArrayTemp() {
+		
+		overallData.delete(0, overallData.capacity());
+		
+		itn = getIntent();
+		
+		overallData.append(itn.getStringExtra("Test Time") + "\r\n");
+		overallData.append("Cell Block Temperature" + "\r\n");
+
+		for(int i = 0; i < 256; i ++) {
+		
+			overallData.append(itn.getStringExtra("Cell Block Temp Data" + Integer.toString(i)) + "\t");
+		}
+
+		overallData.append("\r\n" +"Ambient Temp Data" + "\r\n");
+
+		for(int i = 0; i < 256; i ++) {
+		
+			overallData.append(itn.getStringExtra("Ambient Temp Data" + Integer.toString(i)) + "\t");
+		}
+	}
+	
+	public void DataArrayPhoto() {
+		
+		overallData.delete(0, overallData.capacity());
+		
+		itn = getIntent();
+		
+		overallData.append(itn.getStringExtra("Test Time") + "\r\n");
+		overallData.append("535nm Light Intensity" + "\r\n");
+
+		for(int i = 0; i < 256; i ++) {
+		
+			overallData.append(itn.getStringExtra("Photo Data" + Integer.toString(i)) + "\t");
+		}
+	}
+	
 	public void WhichIntent() { // Activity conversion
 	
-		Intent RemoveIntent = new Intent(getApplicationContext(), RemoveActivity.class);
 		
 		switch(whichState) {
 		
 		case 6	:
+			Intent RemoveIntent = new Intent(getApplicationContext(), RemoveActivity.class);
+			startActivity(RemoveIntent);
+			break;
+			
+		case 8	:
+			Intent TempIntent = new Intent(getApplicationContext(), TemperatureActivity.class);
+			startActivity(TempIntent);
+			break;
+			
+		case 9	:
+			Intent PhotoIntent = new Intent(getApplicationContext(), PhotoActivity.class);
+			startActivity(PhotoIntent);
 			break;
 			
 		default	:
-			RemoveIntent.putExtra("WhichIntent", whichState);
-			RemoveIntent.putExtra("DataCnt", DataCnt);
+			Intent RemoveIntent2 = new Intent(getApplicationContext(), RemoveActivity.class);
+			RemoveIntent2.putExtra("WhichIntent", whichState);
+			RemoveIntent2.putExtra("DataCnt", DataCnt);
+			startActivity(RemoveIntent2);
 			break;
 		}
-		
-		startActivity(RemoveIntent);
 		
 		finish();
 	}

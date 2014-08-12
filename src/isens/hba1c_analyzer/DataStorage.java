@@ -183,6 +183,41 @@ public class DataStorage extends Activity {
 		}		
 	}
 	
+	public synchronized void TestSave(String str, StringBuffer sData1) { // Save data to uSD card
+		
+		String sdPath = SDCardState();
+		
+		File dir = new File(sdPath + SAVE_DIRECTORY); // File directory
+				 		
+		File file = new File(sdPath + SAVE_DIRECTORY + str + ".txt"); // File
+				
+		try {
+
+			if(!dir.isDirectory()) { // if directory doesn't exist 
+
+				dir.mkdirs();
+				file.createNewFile();
+			}
+			
+			FileOutputStream fos = new FileOutputStream(file, true);
+			
+			fos.write(sData1.toString().getBytes());
+			fos.close();
+			
+			while(!file.exists()); // Wait until file is created
+			
+		} catch(FileNotFoundException e) {
+			
+			e.printStackTrace();					
+			return;
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			return;
+		}		
+	}
+	
 	public String FileCheck(int num, int type) { // Checking specific file 
 		
 		String sdPath = SDCardState(),

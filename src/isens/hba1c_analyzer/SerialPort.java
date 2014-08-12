@@ -120,7 +120,7 @@ public class SerialPort {
 				BoardFileOutputStream = new FileOutputStream(BoardFd);				
 
 				if (BoardFileOutputStream != null) {
-//					Log.w("BoardTxThread", "message : " + message);
+					Log.w("BoardTxThread", "message : " + message);
 					BoardFileOutputStream.write(STX);
 
 					switch(target) {

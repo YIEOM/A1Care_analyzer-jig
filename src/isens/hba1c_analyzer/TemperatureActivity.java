@@ -25,9 +25,7 @@ import android.widget.Toast;
 
 public class TemperatureActivity extends Activity {
 	
-	private SerialPort TemperatureSerial;
 	private Temperature TemperatureTemp;
-	private DataStorage TemperatureData;
 	
 	private Handler handler = new Handler();
 	private TimerTask OneSecondPeriod;
@@ -63,7 +61,7 @@ public class TemperatureActivity extends Activity {
 		
 				escBtn.setEnabled(false);
 				
-				WhichIntent(TargetIntent.SystemSetting);
+				WhichIntent(TargetIntent.Test);
 			}
 		});
 		
@@ -90,7 +88,6 @@ public class TemperatureActivity extends Activity {
 		        runOnUiThread(new Runnable(){
 		            public void run() {
 		            	
-//		            	Log.w("SettingTimeDisplay", "run");
 		            	TimeText.setText(TimerDisplay.rTime[3] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
 		            }
 		        });
@@ -147,10 +144,12 @@ public class TemperatureActivity extends Activity {
 		cellBlockTempData[dataIndex] = cellBlockStr;
 		ambientTempData[dataIndex++] = ambientStr;
 		
-//		if(dataIndex == 256) {
-//			
-//			WhichIntent(TargetIntent.FileSave);
-//		}
+		if(dataIndex == 256) {
+			
+			dataIndex = 0;
+			
+			WhichIntent(TargetIntent.FileSave);	
+		}
 	}
 	
 	public void WhichIntent(TargetIntent Itn) { // Activity conversion
@@ -159,20 +158,21 @@ public class TemperatureActivity extends Activity {
 		
 		switch(Itn) {
 		
-		case SystemSetting	:
-			Intent SystemSettingIntent = new Intent(getApplicationContext(), SystemSettingActivity.class);
-			startActivity(SystemSettingIntent);
+		case Test			:
+			Intent TestIntent = new Intent(getApplicationContext(), TestActivity.class);
+			startActivity(TestIntent);
 			break;
 						
 		case FileSave		:
-			Intent TempFileSaveIntent = new Intent(getApplicationContext(), TempFileSaveActivity.class);
-			TempFileSaveIntent.putExtra("Test Time", TimerDisplay.rTime[3] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
+			Intent FileSaveIntent = new Intent(getApplicationContext(), FileSaveActivity.class);
+			FileSaveIntent.putExtra("WhichIntent", TestActivity.TEMPERATURE);
+			FileSaveIntent.putExtra("Test Time", TimerDisplay.rTime[3] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
 			for(int i = 0; i < 256; i ++) {
 				
-				TempFileSaveIntent.putExtra("Cell Block Temp Data" + Integer.toString(i), cellBlockTempData[i]);
-				TempFileSaveIntent.putExtra("Ambient Temp Data" + Integer.toString(i), ambientTempData[i]);
+				FileSaveIntent.putExtra("Cell Block Temp Data" + Integer.toString(i), cellBlockTempData[i]);
+				FileSaveIntent.putExtra("Ambient Temp Data" + Integer.toString(i), ambientTempData[i]);
 			}
-			startActivity(TempFileSaveIntent);
+			startActivity(FileSaveIntent);
 			break;
 			
 		default		:	

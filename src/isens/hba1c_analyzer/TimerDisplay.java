@@ -22,7 +22,7 @@ public class TimerDisplay {
 							 ImageClock, DataSettingClock, MaintenanceClock, DateClock, 
 							 TimeClock, DisplayClock, HISClock, HISSettingClock, AdjustmentClock, 
 							 SoundClock, CalibrationClock, LanguageClock, SystemCheckClock, 
-							 CorrelationClock, TemperatureClock, LabViewClock}
+							 CorrelationClock, TemperatureClock, LabViewClock, PhotoClock}
 	public static whichClock timerState;
 
 	final static String rTime[] = new String[8];
@@ -53,6 +53,7 @@ public class TimerDisplay {
 	private CorrelationFactorActivity TimerCorrelation;
 	private TemperatureActivity	TimerTemperature;
 	private LabViewActivity TimerLabView;
+	private PhotoActivity TimerPhoto;
 	
 	public static int cnt = 0;
 	
@@ -245,6 +246,11 @@ public class TimerDisplay {
 		case LabViewClock		:
 			TimerLabView = new LabViewActivity();
 			TimerLabView.CurrTimeDisplay();
+			break;
+			
+		case PhotoClock		:
+			TimerPhoto = new PhotoActivity();
+			TimerPhoto.CurrTimeDisplay();
 			break;
 			
 		default					:	
