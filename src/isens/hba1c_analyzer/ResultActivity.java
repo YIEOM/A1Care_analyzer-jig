@@ -169,6 +169,10 @@ public class ResultActivity extends Activity {
 			
 			WhichIntent(TargetIntent.Test);
 			break;
+		
+		case TestActivity.PHOTO_ABSORBANCE	:
+			WhichIntent(TargetIntent.Test);
+			break;
 			
 		default	:
 			GetDataCnt();
@@ -307,6 +311,21 @@ public class ResultActivity extends Activity {
 			}
 			
 			DataSaveIntent.putExtra("WhichIntent", TestActivity.PHOTO_TEMPERATURE);
+			startActivity(DataSaveIntent);
+			break;
+		
+		case TestActivity.PHOTO_ABSORBANCE	:
+			for(int i =0; i < 3; i++) {
+				
+				DataSaveIntent.putExtra("Step1Value1" + Integer.toString(i), photoDfm.format(RunActivity.Step1stValue1[i]));
+				DataSaveIntent.putExtra("Step1Value2" + Integer.toString(i), photoDfm.format(RunActivity.Step1stValue2[i]));
+				DataSaveIntent.putExtra("Step1Value3" + Integer.toString(i), photoDfm.format(RunActivity.Step1stValue3[i]));
+				DataSaveIntent.putExtra("Step2Value1" + Integer.toString(i), photoDfm.format(RunActivity.Step2ndValue1[i]));
+				DataSaveIntent.putExtra("Step2Value2" + Integer.toString(i), photoDfm.format(RunActivity.Step2ndValue2[i]));
+				DataSaveIntent.putExtra("Step2Value3" + Integer.toString(i), photoDfm.format(RunActivity.Step2ndValue3[i]));
+			}
+			
+			DataSaveIntent.putExtra("WhichIntent", TestActivity.PHOTO_ABSORBANCE);
 			startActivity(DataSaveIntent);
 			break;
 			

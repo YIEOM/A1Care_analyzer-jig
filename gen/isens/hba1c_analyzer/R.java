@@ -282,7 +282,6 @@ public final class R {
     }
     public static final class id {
         public static final int HbA1cText=0x7f0b001f;
-        public static final int abtn=0x7f0b00ad;
         public static final int ackText=0x7f0b0062;
         public static final int action_settings=0x7f0b00b9;
         public static final int actionlinear=0x7f0b0000;
@@ -376,6 +375,7 @@ public final class R {
         public static final int patientidscanbtn=0x7f0b0094;
         public static final int patientidtext=0x7f0b0063;
         public static final int pbtn=0x7f0b00b0;
+        public static final int photoabsbtn=0x7f0b00ad;
         public static final int photobtn=0x7f0b00ac;
         public static final int phototempbtn=0x7f0b00ab;
         public static final int phototext=0x7f0b008d;

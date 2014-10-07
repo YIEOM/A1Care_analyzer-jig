@@ -72,6 +72,12 @@ public class FileSaveActivity extends Activity {
 			
 			SaveData.TestSave("/PhotoData", overallData);
 			break;
+		
+		case 10	:
+			DataArrayPhotoAbs();
+			
+			SaveData.TestSave("/PhotoAbsData", overallData);
+			break;
 			
 		default	:
 			DataArray();
@@ -220,6 +226,43 @@ public class FileSaveActivity extends Activity {
 		}
 	}
 	
+	public void DataArrayPhotoAbs() {
+		
+		overallData.delete(0, overallData.capacity());
+		
+		itn = getIntent();
+		
+		overallData.append(itn.getStringExtra("Year"));
+		overallData.append(itn.getStringExtra("Month"));
+		overallData.append(itn.getStringExtra("Day"));
+		overallData.append(itn.getStringExtra("AmPm"));
+		overallData.append(itn.getStringExtra("Hour"));
+		overallData.append(itn.getStringExtra("Minute"));
+		overallData.append(itn.getStringExtra("Hba1cPct") + "\t");			
+			
+		overallData.append(itn.getStringExtra("BlankVal0") + "\t");
+		overallData.append(itn.getStringExtra("BlankVal1") + "\t");
+		overallData.append(itn.getStringExtra("BlankVal2") + "\t");
+		overallData.append(itn.getStringExtra("BlankVal3") + "\t");
+		
+		for(int i = 0; i < 3; i++) {
+			
+			overallData.append(itn.getStringExtra("Step1Value1" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Step1Value2" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Step1Value3" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Step2Value1" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Step2Value2" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Step2Value3" + Integer.toString(i)) + "\t");
+		
+			overallData.append(itn.getStringExtra("St1Abs1by" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("St1Abs2by" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("St1Abs3by" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("St2Abs1by" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("St2Abs2by" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("St2Abs3by" + Integer.toString(i)) + "\t");
+		}
+	}
+	
 	public void WhichIntent() { // Activity conversion
 	
 		
@@ -238,6 +281,12 @@ public class FileSaveActivity extends Activity {
 		case 9	:
 			Intent PhotoIntent = new Intent(getApplicationContext(), PhotoActivity.class);
 			startActivity(PhotoIntent);
+			break;
+		
+		case 10	:
+			Intent PhotoAbsIntent = new Intent(getApplicationContext(), RemoveActivity.class);
+			PhotoAbsIntent.putExtra("WhichIntent", whichState);
+			startActivity(PhotoAbsIntent);
 			break;
 			
 		default	:

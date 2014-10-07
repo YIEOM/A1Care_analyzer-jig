@@ -202,6 +202,7 @@ public class DataStorage extends Activity {
 			FileOutputStream fos = new FileOutputStream(file, true);
 			
 			fos.write(sData1.toString().getBytes());
+			fos.write("\n".getBytes());
 			fos.close();
 			
 			while(!file.exists()); // Wait until file is created

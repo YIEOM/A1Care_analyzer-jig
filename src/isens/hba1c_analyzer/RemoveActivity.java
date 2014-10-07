@@ -58,7 +58,11 @@ public class RemoveActivity extends Activity {
 				WhichIntent(TargetIntent.Home);	
 			}
 			break;
-			
+		
+		case TestActivity.PHOTO_ABSORBANCE	:
+			WhichIntent(TargetIntent.Test);	
+			break;
+		
 		default	:
 			UserAction UserActionObj = new UserAction();
 			UserActionObj.start();
@@ -187,6 +191,11 @@ public class RemoveActivity extends Activity {
 		case Blank		:				
 			Intent BlankIntent = new Intent(getApplicationContext(), BlankActivity.class);
 			startActivity(BlankIntent);
+			break;
+			
+		case Test		:				
+			Intent TestIntent = new Intent(getApplicationContext(), TestActivity.class);
+			startActivity(TestIntent);
 			break;
 			
 		default		:	

@@ -70,7 +70,13 @@ public class Barcode {
 				H   = 0.2 * (0.5 * ((int) buffer.charAt(13) - 42) - 5) + 9; // A1c-High %
 				
 				sum = ( test + yearTens + yearUnits + week + day + locate ) % 10; // Checksum bit
-				
+//				Log.w("Barcode", "test : " + test);
+//				Log.w("Barcode", "yearTens : " + yearTens);
+//				Log.w("Barcode", "yearUnits : " + yearUnits);
+//				Log.w("Barcode", "week : " + week);
+//				Log.w("Barcode", "day : " + day);
+//				Log.w("Barcode", "locate : " + locate);
+//				Log.w("Barcode", "Check Sum : " + sum);
 				if( sum == check ) { // Whether or not the correct barcode code
 	
 //					Log.w("Barcode", "Correct Data : " + buffer);

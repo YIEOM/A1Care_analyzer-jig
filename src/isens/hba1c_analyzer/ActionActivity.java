@@ -216,8 +216,19 @@ public class ActionActivity extends Activity {
 				
 				if(IsCorrectBarcode) {
 					
-					CartridgeInsert CartridgeInsertObj = new CartridgeInsert();
-					CartridgeInsertObj.start();
+					switch(TestActivity.WhichTest) {
+					
+					case TestActivity.PHOTO_ABSORBANCE	:
+						ActionActivity.CartridgeCheckFlag = 1;
+						CollectorCover CollectorCoverObj = new CollectorCover();
+						CollectorCoverObj.start();
+						break;
+					
+					default :
+						CartridgeInsert CartridgeInsertObj = new CartridgeInsert();
+						CartridgeInsertObj.start();
+						break;
+					}
 					
 				} else { // to test
 				
@@ -307,7 +318,6 @@ public class ActionActivity extends Activity {
 				actionLinear.setBackgroundResource(R.drawable.ani_close_bg);
 				scanImage.setBackgroundResource(R.drawable.useract4);
 				scanAni = (AnimationDrawable)scanImage.getBackground();
-//				            	Log.w("CoverAniStart", "run");
             	scanAni.start();
 			 }
 		});
