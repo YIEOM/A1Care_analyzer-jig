@@ -14,7 +14,7 @@ public class Temperature extends SerialPort {
 	
 	public TextView TmpText;
 	
-	final static double InitTmp = (double) 30; // Celsius temperature
+	final static double InitTmp = (double) 31; // Celsius temperature
 	
 	public void TmpInit() { // Initial temperature of cell block set-up
 		
