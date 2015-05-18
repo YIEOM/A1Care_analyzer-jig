@@ -26,6 +26,13 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 
+/*
+ * 
+ * Object : Test SW
+ * Revision Date : 2014-10-02
+ * 
+*/
+
 public class HomeActivity extends Activity {
 
 	final static double MAX_TEMP = 39.7, // 36.7 max Temperature
@@ -40,6 +47,11 @@ public class HomeActivity extends Activity {
 					  PHOTO_SENSOR_ERROR = 5,
 					  CELL_TEMPERATURE_ERROR = 6,
 					  AMBIENT_TEMPERATURE_ERROR = 7;
+	
+	final static byte BARCODE_v2_0 = 0,
+					  BARCODE_v4_0 = 1;
+	
+	final static byte BARCODE_SYSTEM = BARCODE_v4_0;
 	
 	private SerialPort HomeSerial;
 	

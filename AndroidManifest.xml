@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="isens.hba1c_analyzer"
     android:versionCode="1"
-    android:versionName="1.0"
+    android:versionName="v1.3.00-J"
     android:sharedUserId="android.uid.system" >
     
     <uses-sdk
@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SET_TIME"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/> 
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
     <uses-feature android:name="android.hardware.usb.accessory"/>
     
@@ -80,8 +80,9 @@
 		<activity android:name="HomeActivity"></activity>>
 		<activity android:name="CalibrationActivity"></activity>
 		<activity android:name="LanguageActivity"></activity>
+		<activity android:name="TemperatureActivity"></activity>
 		<activity android:name="TempFileSaveActivity" android:process="com.android.phone"></activity>
-		<activity android:name="TemperatureActivity">
+		<activity android:name="TemperatureTestActivity">
     	    <intent-filter >
            	    <action android:name=""/>
            	</intent-filter>

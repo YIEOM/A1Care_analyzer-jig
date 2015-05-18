@@ -14,7 +14,19 @@ public class Temperature extends SerialPort {
 	
 	public TextView TmpText;
 	
-	final static double InitTmp = (double) 31; // Celsius temperature
+//	final static double TEMP_PP4  = (double) 29.5,
+//						TEMP_PP6  = (double) 30.7,
+//						TEMP_PP8  = (double) 29.5,
+//						TEMP_PP9  = (double) 28.5,
+//						TEMP_PP12 = (double) 30,
+//						TEMP_PP14 = (double) 33.5,
+//						TEMP_PP15 = (double) 30,
+//						TEMP_PP16 = (double) 31,
+//						TEMP_PP17 = (double) 32;
+//	
+//	final static double InitTmp = TEMP_PP17; // Celsius temperature
+	
+	public static float InitTmp;
 	
 	public void TmpInit() { // Initial temperature of cell block set-up
 		
@@ -46,11 +58,35 @@ public class Temperature extends SerialPort {
 		return tmpDouble;
 	}
 	
-	public double AmbTmpRead() { // Read current ambient temperature
+//	public double AmbTmpRead() { // Read current ambient temperature
+//	
+//		int tmpADC;
+//		double tmpDouble,
+//			   tmpV;
+//		String tmpData;
+//		
+//		BoardTx(TEMPERATURE_AMBIENT, CtrTarget.AmbientTmpCall);
+//				
+//		tmpData = SensorMessageOutput();
+//		
+//		while(!tmpData.substring(1, 2).equals("T")) {
+//			
+//			tmpData = SensorMessageOutput();
+//		}
+//		
+//		tmpADC = Integer.parseInt(tmpData.substring(2));
+//		
+//		tmpV = ((double) 5/1024 * (tmpADC + 1));
+//		tmpDouble = (double) tmpV / 0.01;
+//		
+//		return tmpDouble;
+//	}
 	
+	public double AmbTmpRead() { // Read current ambient temperature
+		
 		int tmpADC;
 		double tmpDouble,
-			   tmpV;
+			   thOhm;
 		String tmpData;
 		
 		BoardTx(TEMPERATURE_AMBIENT, CtrTarget.AmbientTmpCall);
@@ -64,9 +100,9 @@ public class Temperature extends SerialPort {
 		
 		tmpADC = Integer.parseInt(tmpData.substring(2));
 		
-		tmpV = ((double) 5/1024 * (tmpADC + 1));
-		tmpDouble = (double) tmpV / 0.01;
+		thOhm = ((double) 5/1024 * (tmpADC + 1));
+		tmpDouble = (double) thOhm / 0.01;
 		
 		return tmpDouble;
-	}	
+	}
 }

@@ -51,7 +51,7 @@ public class TimerDisplay {
 	private LanguageActivity TimerLanguage;
 	private GpioPort TimerGpio;
 	private CorrelationFactorActivity TimerCorrelation;
-	private TemperatureActivity	TimerTemperature;
+	private TemperatureTestActivity	TimerTemperatureTest;
 	private LabViewActivity TimerLabView;
 	private PhotoActivity TimerPhoto;
 	
@@ -239,8 +239,8 @@ public class TimerDisplay {
 			break;
 			
 		case TemperatureClock	:
-			TimerTemperature = new TemperatureActivity();
-			TimerTemperature.CurrTimeDisplay();
+			TimerTemperatureTest = new TemperatureTestActivity();
+			TimerTemperatureTest.CurrTimeDisplay();
 			break;
 			
 		case LabViewClock		:

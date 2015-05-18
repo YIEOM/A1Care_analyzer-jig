@@ -52,8 +52,9 @@ public class RunActivity extends Activity {
 	private DecimalFormat ShkDf = new DecimalFormat("0000");
 	
 	final static byte FIRST_SHAKING_TIME = 105, // Motor shaking time, default : 6 * 105(sec) = 0630
-					  SECOND_SHAKING_TIME = 90; // Motor shaking time, default : 6 * 90(sec) = 0540
-	
+					  SECOND_SHAKING_TIME = 90, // Motor shaking time, default : 6 * 90(sec) = 0540
+					  QUICK_SHAKING_TIME = 5;	
+					  
 	final static double MinAbsorb = 160000,
 						MaxAbsorb = 175000;
 	
@@ -223,10 +224,21 @@ public class RunActivity extends Activity {
 			BarAnimation(171);
 			SerialPort.Sleep(500);
 			
-			MotionInstruct(ShkDf.format(FIRST_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
-			MotorShakeFlag = true;
-			ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(174, FIRST_SHAKING_TIME);
-			ShakingAniThreadObj.start();
+			if(TestActivity.WhichTest != TestActivity.PHOTO_ABSORBANCE) {
+				
+				MotionInstruct(ShkDf.format(FIRST_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6.5 * 10(sec) = 0065
+				MotorShakeFlag = true;
+				ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(174, FIRST_SHAKING_TIME);
+				ShakingAniThreadObj.start();
+	
+			} else {
+				
+				MotionInstruct(ShkDf.format(QUICK_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
+				MotorShakeFlag = true;
+				ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(174, QUICK_SHAKING_TIME);
+				ShakingAniThreadObj.start();
+			}
+			
 			while(!MOTOR_COMPLETE.equals(RunSerial.BoardMessageOutput())); // temporary
 			MotorShakeFlag = false;
 			
@@ -389,10 +401,21 @@ public class RunActivity extends Activity {
 			while(!Step2nd_POSITION.equals(RunSerial.BoardMessageOutput()));
 			BarAnimation(372);
 						
-			MotionInstruct(ShkDf.format(SECOND_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
-			MotorShakeFlag = true;
-			ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(375, SECOND_SHAKING_TIME);
-			ShakingAniThreadObj.start();
+			if(TestActivity.WhichTest != TestActivity.PHOTO_ABSORBANCE) {
+				
+				MotionInstruct(ShkDf.format(SECOND_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
+				MotorShakeFlag = true;
+				ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(375, SECOND_SHAKING_TIME);
+				ShakingAniThreadObj.start();	
+			
+			} else {
+				
+				MotionInstruct(ShkDf.format(QUICK_SHAKING_TIME * 6), SerialPort.CtrTarget.MotorSet);  // Motor shaking time, default : 6 * 10(sec) = 0065
+				MotorShakeFlag = true;
+				ShakingAniThread ShakingAniThreadObj = new ShakingAniThread(375, QUICK_SHAKING_TIME);
+				ShakingAniThreadObj.start();
+			}
+			
 			while(!MOTOR_COMPLETE.equals(RunSerial.BoardMessageOutput())); // temporary
 			MotorShakeFlag = false;
 			
@@ -712,6 +735,9 @@ public class RunActivity extends Activity {
 		b4 = b3 - (a4 * St);
 		
 		HbA1cPctDbl = (B - (St * a4 + b4)) / a3 / St * 100; // %-HbA1c(%)
+		
+		HbA1cPctDbl = (Barcode.Sm + Barcode.Ss) * HbA1cPctDbl + (Barcode.Im + Barcode.Is); 
+		
 		HbA1cPctDbl = CF_Slope * (AF_Slope * HbA1cPctDbl + AF_Offset) + CF_Offset;
 		
 		DecimalFormat hbA1cFormat = new DecimalFormat("0.0");
@@ -835,11 +861,6 @@ public class RunActivity extends Activity {
 	        	if(CartStepStopped) break;
 			}
 		}
-	}
-	
-	public void BoardMessage(String rspStr, int rspTime, AnalyzerState nextState) {
-		
-		
 	}
 	
 	public void BarAnimation(final int x) { // running bar animation

@@ -84,12 +84,12 @@ public class SystemCheckActivity extends Activity {
 		SystemGpio = new GpioPort();
 		SystemGpio.TriggerHigh();
 		
+		ParameterInit();
+		
 		/* Temperature setting */
 		SystemTmp = new Temperature(); // to test
 		SystemTmp.TmpInit(); // to test
 		
-		ParameterInit();
-
 		BrightnessInit();
 		
 		VolumeInit();
@@ -151,6 +151,9 @@ public class SystemCheckActivity extends Activity {
 		SharedPreferences LoginPref = getSharedPreferences("Log in", MODE_PRIVATE);
 		HomeActivity.LoginFlag = LoginPref.getBoolean("Activation", true);
 		HomeActivity.CheckFlag = LoginPref.getBoolean("Check Box", false);
+		
+		SharedPreferences temperaturePref = getSharedPreferences("Temperature", MODE_PRIVATE);
+		Temperature.InitTmp = temperaturePref.getFloat("Cell Block", 30.0f);
 	}
 
 	public void WhichIntent(TargetIntent Itn) { // Activity conversion

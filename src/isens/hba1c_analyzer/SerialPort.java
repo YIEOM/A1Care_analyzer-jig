@@ -415,7 +415,10 @@ public class SerialPort {
 		
 		int tmpTail;
 		
-		while(BoardInputTail == BoardInputHead);
+		while(BoardInputTail == BoardInputHead) {
+			
+			Sleep(10);
+		}
 		tmpTail = (BoardInputTail + 1) % BOARD_INPUT_MASK;
 		BoardInputTail = tmpTail;
 				

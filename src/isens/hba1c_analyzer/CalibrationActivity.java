@@ -1362,6 +1362,9 @@ public class CalibrationActivity extends Activity{
 		
 		ActionActivity.BarcodeCheckFlag = false;
 		
+		RunActivity.HbA1cPctDbl = 0.0;
+		RunActivity.tHbDbl = 0.0;
+		
 		targetMode = TargetMode.Scan;
 		
 		CalibAction = new ActionActivity();
@@ -1381,7 +1384,7 @@ public class CalibrationActivity extends Activity{
 			
 			timer.cancel();
 			
-			HbA1cCalculation();
+			if(ActionActivity.IsCorrectBarcode) HbA1cCalculation();
 			
 			new Thread(new Runnable() {
 			    public void run() {
@@ -1494,6 +1497,9 @@ public class CalibrationActivity extends Activity{
 		b4 = b3 - (a4 * St);
 		
 		RunActivity.HbA1cPctDbl = (B - (St * a4 + b4)) / a3 / St * 100;
+		
+		RunActivity.HbA1cPctDbl = (Barcode.Sm + Barcode.Ss) * RunActivity.HbA1cPctDbl + (Barcode.Im + Barcode.Is); 
+		
 		RunActivity.HbA1cPctDbl = RunActivity.CF_Slope * (RunActivity.AF_Slope * RunActivity.HbA1cPctDbl + RunActivity.AF_Offset) + RunActivity.CF_Offset;
 	}
 	

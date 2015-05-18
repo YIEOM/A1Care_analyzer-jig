@@ -70,7 +70,7 @@
         android:textColor="#565656"
         android:singleLine="true" 
         android:imeOptions="actionDone"
-        android:inputType="numberDecimal"
+        android:inputType="numberSigned|numberDecimal"
         android:longClickable="false"
         android:background="@drawable/af_slope_box" />
             
@@ -93,7 +93,7 @@
         android:textColor="#565656"
         android:singleLine="true" 
         android:imeOptions="actionDone"
-        android:inputType="numberDecimal"
+        android:inputType="numberSigned|numberDecimal"
         android:longClickable="false"
         android:background="@drawable/af_intercept_box" />
 

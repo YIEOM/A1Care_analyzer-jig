@@ -196,18 +196,18 @@ public class FileSaveActivity extends Activity {
 		itn = getIntent();
 		
 		overallData.append(itn.getStringExtra("Test Time") + "\r\n");
-		overallData.append("Cell Block Temperature" + "\r\n");
+		overallData.append("Chamber Temp Data" + "\r\n");
 
 		for(int i = 0; i < 256; i ++) {
 		
-			overallData.append(itn.getStringExtra("Cell Block Temp Data" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Chamber Temp Data" + Integer.toString(i)) + "\t");
 		}
 
-		overallData.append("\r\n" +"Ambient Temp Data" + "\r\n");
+		overallData.append("\r\n" +"Inside Temp Data" + "\r\n");
 
 		for(int i = 0; i < 256; i ++) {
 		
-			overallData.append(itn.getStringExtra("Ambient Temp Data" + Integer.toString(i)) + "\t");
+			overallData.append(itn.getStringExtra("Inside Temp Data" + Integer.toString(i)) + "\t");
 		}
 	}
 	
@@ -274,7 +274,7 @@ public class FileSaveActivity extends Activity {
 			break;
 			
 		case 8	:
-			Intent TempIntent = new Intent(getApplicationContext(), TemperatureActivity.class);
+			Intent TempIntent = new Intent(getApplicationContext(), TemperatureTestActivity.class);
 			startActivity(TempIntent);
 			break;
 			
