@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -33,6 +35,8 @@ public class SystemCheckActivity extends Activity {
 	private SerialPort SystemSerial;
 	private Temperature SystemTmp;
 	private TimerDisplay SystemTimer;
+	
+	private Activity activity;
 	
 	private AudioManager audioManager;
 	
@@ -68,6 +72,8 @@ public class SystemCheckActivity extends Activity {
 	
 	public void SystemCheckInit() {
 	
+		activity = this;
+		
 		/* Serial communication start */
 		SystemSerial = new SerialPort();
 		SystemSerial.BoardSerialInit();
@@ -93,6 +99,8 @@ public class SystemCheckActivity extends Activity {
 		BrightnessInit();
 		
 		VolumeInit();
+		
+		HomeActivity.SWVersion = getSWVersion();
 		
 		WhichIntent(TargetIntent.Home);
 	}
@@ -156,6 +164,56 @@ public class SystemCheckActivity extends Activity {
 		Temperature.InitTmp = temperaturePref.getFloat("Cell Block", 30.0f);
 	}
 
+	public String getSWVersion() {
+		
+		GetSWVersion mGetSWVersion = new GetSWVersion(activity);
+		mGetSWVersion.start();
+		
+		try {
+		
+			mGetSWVersion.join();
+		
+		} catch (InterruptedException e) {
+		
+			e.printStackTrace();
+		}
+		
+		return mGetSWVersion.getVersion();
+	}
+	
+	public class GetSWVersion extends Thread {
+		
+		PackageInfo pi = null;
+		String version;
+		Activity activity;
+		
+		public GetSWVersion(Activity activity) {
+			
+			this.activity = activity;
+		}
+		
+		public void run() {
+			
+			try {
+
+				pi = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+
+				version = pi.versionName;
+				
+			} catch (NameNotFoundException e) {
+
+				e.printStackTrace();
+				
+				version = "Nothing";
+			}		
+		}
+		
+		public String getVersion() {
+			
+			return version;
+		}
+	}
+	
 	public void WhichIntent(TargetIntent Itn) { // Activity conversion
 		
 		switch(Itn) {

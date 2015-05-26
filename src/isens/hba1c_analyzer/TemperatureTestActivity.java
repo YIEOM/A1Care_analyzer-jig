@@ -26,6 +26,8 @@ import android.widget.Toast;
 
 public class TemperatureTestActivity extends Activity {
 	
+	public final static int TEMP_DATA_SIZE = 30;
+	
 	private Temperature TemperatureTemp;
 	
 	private Handler handler = new Handler();
@@ -39,8 +41,9 @@ public class TemperatureTestActivity extends Activity {
 		
 	public static TextView TimeText;
 	
-	private String cellBlockTempData[] = new String[256],
-				   ambientTempData[] = new String[256];
+	private String 
+//	cellBlockTempData[] = new String[256],
+				   ambientTempData[] = new String[TEMP_DATA_SIZE];
 	
 	private int dataIndex = 0;
 	
@@ -51,7 +54,7 @@ public class TemperatureTestActivity extends Activity {
 		
 		TimeText = (TextView)findViewById(R.id.timeText);
 				
-		cellBlockTempText = (TextView) findViewById(R.id.cellblocktemptext);
+//		cellBlockTempText = (TextView) findViewById(R.id.cellblocktemptext);
 		ambientTempText = (TextView) findViewById(R.id.ambienttemptext);
 		
 		/*System setting Activity activation*/
@@ -74,8 +77,8 @@ public class TemperatureTestActivity extends Activity {
 		TimerDisplay.timerState = whichClock.TemperatureClock;		
 		CurrTimeDisplay();
 		
-		cellBlockTempData = new String[256];
-		ambientTempData = new String[256];
+//		cellBlockTempData = new String[256];
+		ambientTempData = new String[TEMP_DATA_SIZE];
 		
 		dataIndex = 0;
 		
@@ -99,12 +102,14 @@ public class TemperatureTestActivity extends Activity {
 	public void TimerInit() {
 		
 		OneSecondPeriod = new TimerTask() {
+		
+			int cnt = 0;
 			
 			public void run() {
 				Runnable updater = new Runnable() {
 					public void run() {
 						
-						TemperatureDisplay();
+						if((cnt++ % 10) == 0) TemperatureDisplay();
 					}
 				};
 				
@@ -125,9 +130,9 @@ public class TemperatureTestActivity extends Activity {
 					 ambientStr;		
 		
 		TemperatureTemp = new Temperature();
-		cellBlock = TemperatureTemp.CellTmpRead();
+//		cellBlock = TemperatureTemp.CellTmpRead();
 		ambient = TemperatureTemp.AmbTmpRead();
-		cellBlockStr = dfm.format(cellBlock);
+//		cellBlockStr = dfm.format(cellBlock);
 		ambientStr = dfm.format(ambient);
 		
 		new Thread(new Runnable() {
@@ -135,17 +140,17 @@ public class TemperatureTestActivity extends Activity {
 				runOnUiThread(new Runnable(){
 					public void run() {
 						
-						cellBlockTempText.setText(cellBlockStr);
+//						cellBlockTempText.setText(cellBlockStr);
 						ambientTempText.setText(ambientStr);
 					}
 				});
 			}
 		}).start();
 
-		cellBlockTempData[dataIndex] = cellBlockStr;
+//		cellBlockTempData[dataIndex] = cellBlockStr;
 		ambientTempData[dataIndex++] = ambientStr;
 		
-		if(dataIndex == 256) {
+		if(dataIndex == TEMP_DATA_SIZE) {
 			
 			dataIndex = 0;
 			
@@ -167,10 +172,10 @@ public class TemperatureTestActivity extends Activity {
 		case FileSave		:
 			Intent FileSaveIntent = new Intent(getApplicationContext(), FileSaveActivity.class);
 			FileSaveIntent.putExtra("WhichIntent", TestActivity.TEMPERATURE);
-			FileSaveIntent.putExtra("Test Time", TimerDisplay.rTime[3] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
-			for(int i = 0; i < 256; i ++) {
+			FileSaveIntent.putExtra("Test Time", TimerDisplay.rTime[1] + "." + TimerDisplay.rTime[2] + " " + TimerDisplay.rTime[3] + " " + TimerDisplay.rTime[4] + ":" + TimerDisplay.rTime[5]);
+			for(int i = 0; i < TEMP_DATA_SIZE; i ++) {
 				
-				FileSaveIntent.putExtra("Chamber Temp Data" + Integer.toString(i), cellBlockTempData[i]);
+//				FileSaveIntent.putExtra("Chamber Temp Data" + Integer.toString(i), cellBlockTempData[i]);
 				FileSaveIntent.putExtra("Inside Temp Data" + Integer.toString(i), ambientTempData[i]);
 			}
 			startActivity(FileSaveIntent);

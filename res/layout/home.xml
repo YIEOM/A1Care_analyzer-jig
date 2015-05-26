@@ -54,5 +54,16 @@
         android:layout_marginLeft="78px"
         android:layout_marginTop="229px"
         android:background="@drawable/record_selector" />
+    
+    <TextView
+   	    android:id="@+id/swvertext"
+	    android:layout_width="200px"
+	    android:layout_height="30px"
+	    android:layout_marginLeft="590px"
+	    android:layout_marginTop="440px"
+	    android:gravity="bottom|right"
+        android:typeface="sans"
+        android:textSize="18px"
+        android:textColor="#04A458" />
               
 </RelativeLayout>

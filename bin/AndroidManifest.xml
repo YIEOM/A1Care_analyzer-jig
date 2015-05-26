@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="isens.hba1c_analyzer"
     android:versionCode="1"
-    android:versionName="v1.3.00-J"
+    android:versionName="v1.3.01-J"
     android:sharedUserId="android.uid.system" >
     
     <uses-sdk
